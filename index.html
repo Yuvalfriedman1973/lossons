@@ -303,13 +303,33 @@
     }
 
     function rowsToTopics(rows) {
-      return rows.slice(1).map(row => ({
-        title:            row[0] || '',
-        recurrence_count: parseInt(row[1], 10) || 1,
-        causes:           row[2] || '',
-        conclusions:      row[3] || '',
-        actions:          row[4] || '',
-      })).filter(t => t.title);
+      const topics = [];
+      let current = null;
+
+      for (const row of rows) {
+        const text = (row[0] || '').trim();
+        if (!text) continue;
+
+        if (/^נושא/.test(text)) {
+          if (current) topics.push(current);
+          const title = text.replace(/^נושא\s*\d*\s*[:\-–]\s*/, '').trim();
+          current = { title, recurrence_count: 1, causes: '', conclusions: '', actions: '' };
+        } else if (/^סיבות?\s*:/.test(text)) {
+          if (current) current.causes = text.replace(/^סיבות?\s*:\s*/, '').trim();
+        } else if (/^מסקנות?\s*:/.test(text)) {
+          if (current) current.conclusions = text.replace(/^מסקנות?\s*:\s*/, '').trim();
+        } else if (/^מה יש לעשות/.test(text)) {
+          if (current) current.actions = text.replace(/^מה יש לעשות[^:]*:\s*/, '').trim();
+        } else if (/^מס/.test(text) && /פעמים/.test(text)) {
+          if (current) {
+            const val = text.replace(/^[^:]+:\s*/, '').trim();
+            const n = parseInt(val, 10);
+            current.recurrence_count = isNaN(n) ? 1 : n;
+          }
+        }
+      }
+      if (current) topics.push(current);
+      return topics.filter(t => t.title);
     }
 
     async function loadTopics() {
