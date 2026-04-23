@@ -287,6 +287,83 @@
         return null;
       }
     }
+
+    /* ── Step 1: Sort function ── */
+    function sortTopics(topics) {
+      return [...topics].sort((a, b) => {
+        if (b.recurrence_count !== a.recurrence_count) {
+          return b.recurrence_count - a.recurrence_count;
+        }
+        return a.title.localeCompare(b.title, 'he');
+      });
+    }
+
+    /* ── Step 2: Badge + card render functions + displayedTopics + renderMainView ── */
+    function renderBadge(count) {
+      if (count <= 1) return '';
+      return `<span class="badge">חזר ${count} פעמים</span>`;
+    }
+
+    function renderCard(topic, index) {
+      return `
+        <div class="topic-card" data-index="${index}" role="button" tabindex="0">
+          <span class="topic-card-title">${topic.title}</span>
+          ${renderBadge(topic.recurrence_count)}
+          <span class="topic-card-arrow">&#8592;</span>
+        </div>
+      `;
+    }
+
+    let displayedTopics = [];
+
+    function renderMainView(topics) {
+      const list = document.getElementById('topic-list');
+      if (!topics) {
+        list.innerHTML = '<div class="status-msg error">לא ניתן לטעון את הנתונים, נסה שוב</div>';
+        displayedTopics = [];
+        return;
+      }
+      if (topics.length === 0) {
+        list.innerHTML = '<div class="status-msg">אין נושאים להצגה כרגע</div>';
+        displayedTopics = [];
+        return;
+      }
+      displayedTopics = topics;
+      list.innerHTML = topics.map((t, i) => renderCard(t, i)).join('');
+    }
+
+    /* ── Step 3: Search filter function ── */
+    function filterTopics(topics, query) {
+      if (!query) return topics;
+      const q = query.toLowerCase();
+      return topics.filter(t =>
+        [t.title, t.causes, t.conclusions, t.actions]
+          .some(field => field.toLowerCase().includes(q))
+      );
+    }
+
+    /* ── Step 4: Wire up initMainView ── */
+    let allTopics = [];
+
+    async function initMainView() {
+      const raw = await loadTopics();
+      allTopics = raw ? sortTopics(raw) : null;
+      renderMainView(allTopics || null);
+
+      document.getElementById('search').addEventListener('input', e => {
+        const filtered = filterTopics(allTopics || [], e.target.value.trim());
+        renderMainView(filtered);
+      });
+
+      document.getElementById('topic-list').addEventListener('click', e => {
+        const card = e.target.closest('.topic-card');
+        if (!card) return;
+        const index = parseInt(card.dataset.index, 10);
+        showTopicView(displayedTopics[index]);
+      });
+    }
+
+    initMainView();
   </script>
 </body>
 </html>
