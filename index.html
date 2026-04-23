@@ -70,9 +70,11 @@
       padding: 9px 14px;
       color: var(--text);
       font-family: 'Heebo', sans-serif;
-      font-size: 15px;
+      font-size: 16px; /* ≥16px prevents iOS Safari auto-zoom */
       direction: rtl;
       outline: none;
+      -webkit-appearance: none; /* removes iOS Safari system search-input styling */
+      appearance: none;
     }
 
     .search-bar::placeholder { color: var(--text-muted); }
@@ -97,6 +99,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      -webkit-tap-highlight-color: transparent; /* suppress browser blue tap flash */
     }
 
     .topic-card:active { background: var(--card-hover); }
@@ -148,6 +151,7 @@
       cursor: pointer;
       margin: 14px 0 16px;
       transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent; /* suppress browser blue tap flash */
     }
 
     .back-btn:active { background: var(--back-hover); }
@@ -176,7 +180,6 @@
       font-size: 13px;
       font-weight: 700;
       color: var(--accent);
-      text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 8px;
     }
@@ -205,28 +208,27 @@
 <body>
   <div class="app">
 
-    <!-- Main view -->
+    <!-- Shared header (single <h1> in DOM); JS toggles #search visibility when switching views -->
+    <div class="header" id="main-header">
+      <h1>לקחים חוזרים — נהיגה מבצעית</h1>
+      <input
+        id="search"
+        class="search-bar"
+        type="search"
+        placeholder="חיפוש..."
+        aria-label="חיפוש בלקחים"
+      />
+    </div>
+
+    <!-- Main view (no header inside) -->
     <div id="view-main">
-      <div class="header">
-        <h1>לקחים חוזרים — נהיגה מבצעית</h1>
-        <input
-          id="search"
-          class="search-bar"
-          type="search"
-          placeholder="חיפוש..."
-          aria-label="חיפוש בלקחים"
-        />
-      </div>
       <div id="topic-list" class="topic-list">
         <div class="status-msg">טוען נתונים...</div>
       </div>
     </div>
 
-    <!-- Topic detail view -->
+    <!-- Topic detail view (no header inside) -->
     <div id="view-topic" class="hidden">
-      <div class="header">
-        <h1>לקחים חוזרים — נהיגה מבצעית</h1>
-      </div>
       <div class="view-topic">
         <button class="back-btn" id="back-btn">&#8594; חזרה לרשימה</button>
         <div id="topic-detail-content"></div>
