@@ -283,6 +283,7 @@
         const rows = parseCSV(text);
         return rowsToTopics(rows);
       } catch (e) {
+        console.error('Failed to load lessons:', e);
         return null;
       }
     }
