@@ -299,6 +299,12 @@
     }
 
     /* ── Step 2: Badge + card render functions + displayedTopics + renderMainView ── */
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     function renderBadge(count) {
       if (count <= 1) return '';
       return `<span class="badge">חזר ${count} פעמים</span>`;
@@ -307,7 +313,7 @@
     function renderCard(topic, index) {
       return `
         <div class="topic-card" data-index="${index}" role="button" tabindex="0">
-          <span class="topic-card-title">${topic.title}</span>
+          <span class="topic-card-title">${escapeHtml(topic.title)}</span>
           ${renderBadge(topic.recurrence_count)}
           <span class="topic-card-arrow">&#8592;</span>
         </div>
@@ -360,6 +366,13 @@
         if (!card) return;
         const index = parseInt(card.dataset.index, 10);
         showTopicView(displayedTopics[index]);
+      });
+
+      document.getElementById('topic-list').addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.topic-card')) {
+          e.preventDefault();
+          e.target.closest('.topic-card').click();
+        }
       });
     }
 
