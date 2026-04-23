@@ -305,6 +305,7 @@
     function rowsToTopics(rows) {
       const topics = [];
       let current = null;
+      let currentField = null;
 
       for (const row of rows) {
         const text = (row[0] || '').trim();
@@ -314,18 +315,33 @@
           if (current) topics.push(current);
           const title = text.replace(/^נושא\s*\d*\s*[:\-–]\s*/, '').trim();
           current = { title, recurrence_count: 1, causes: '', conclusions: '', actions: '' };
+          currentField = null;
         } else if (/^סיבות?\s*:/.test(text)) {
-          if (current) current.causes = text.replace(/^סיבות?\s*:\s*/, '').trim();
+          if (current) {
+            current.causes = text.replace(/^סיבות?\s*:\s*/, '').trim();
+            currentField = 'causes';
+          }
         } else if (/^מסקנות?\s*:/.test(text)) {
-          if (current) current.conclusions = text.replace(/^מסקנות?\s*:\s*/, '').trim();
+          if (current) {
+            current.conclusions = text.replace(/^מסקנות?\s*:\s*/, '').trim();
+            currentField = 'conclusions';
+          }
         } else if (/^מה יש לעשות/.test(text)) {
-          if (current) current.actions = text.replace(/^מה יש לעשות[^:]*:\s*/, '').trim();
+          if (current) {
+            current.actions = text.replace(/^מה יש לעשות[^:]*:\s*/, '').trim();
+            currentField = 'actions';
+          }
         } else if (/^מס/.test(text) && /פעמים/.test(text)) {
           if (current) {
             const val = text.replace(/^[^:]+:\s*/, '').trim();
             const n = parseInt(val, 10);
             current.recurrence_count = isNaN(n) ? 1 : n;
+            currentField = null;
           }
+        } else if (current && currentField) {
+          current[currentField] = current[currentField]
+            ? current[currentField] + '\n' + text
+            : text;
         }
       }
       if (current) topics.push(current);
