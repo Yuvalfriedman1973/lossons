@@ -203,6 +203,23 @@
       margin-bottom: 4px;
     }
 
+    .section-actions {
+      background: #1a2e1a;
+      border: 2px solid #5a8a4a;
+      border-right: 5px solid #5a8a4a;
+    }
+
+    .section-actions .section-title {
+      color: #8fcc6f;
+      font-size: 14px;
+    }
+
+    .section-actions .section-list,
+    .section-actions .section-body {
+      color: #f0f0f0;
+      font-weight: 500;
+    }
+
     /* ── Status messages ── */
     .status-msg {
       text-align: center;
@@ -371,14 +388,14 @@
     /* ── Step 4: Wire up initMainView ── */
     let allTopics = [];
 
-    function renderSection(title, body) {
+    function renderSection(title, body, extraClass) {
       if (!body) return '';
       const lines = body.split('\n').map(l => l.trim()).filter(l => l);
       const content = lines.length > 1
         ? '<ol class="section-list">' + lines.map(l => `<li>${escapeHtml(l)}</li>`).join('') + '</ol>'
         : `<div class="section-body">${escapeHtml(body)}</div>`;
       return `
-        <div class="section">
+        <div class="section${extraClass ? ' ' + extraClass : ''}">
           <div class="section-title">${escapeHtml(title)}</div>
           ${content}
         </div>
@@ -404,7 +421,7 @@
         <div class="topic-detail-badge">${renderBadge(topic.recurrence_count)}</div>
         ${renderSection('סיבות', topic.causes)}
         ${renderSection('מסקנות', topic.conclusions)}
-        ${renderSection('מה יש לעשות', topic.actions)}
+        ${renderSection('מה יש לעשות', topic.actions, 'section-actions')}
       `;
       showView('view-topic');
     }
