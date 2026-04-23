@@ -237,8 +237,55 @@
 
   </div>
   <script>
-    // REPLACE THIS URL with your published Google Sheet CSV URL
-    const SHEET_CSV_URL = 'YOUR_GOOGLE_SHEET_CSV_URL_HERE';
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=0&single=true&output=csv';
+
+    function parseCSV(text) {
+      const rows = [];
+      const lines = text.replace(/\r/g, '').split('\n');
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const row = [];
+        let field = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const c = line[i];
+          if (c === '"') {
+            if (inQuotes && line[i + 1] === '"') { field += '"'; i++; }
+            else inQuotes = !inQuotes;
+          } else if (c === ',' && !inQuotes) {
+            row.push(field.trim());
+            field = '';
+          } else {
+            field += c;
+          }
+        }
+        row.push(field.trim());
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function rowsToTopics(rows) {
+      return rows.slice(1).map(row => ({
+        title:            row[0] || '',
+        recurrence_count: parseInt(row[1], 10) || 1,
+        causes:           row[2] || '',
+        conclusions:      row[3] || '',
+        actions:          row[4] || '',
+      })).filter(t => t.title);
+    }
+
+    async function loadTopics() {
+      try {
+        const res = await fetch(SHEET_CSV_URL);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        const rows = parseCSV(text);
+        return rowsToTopics(rows);
+      } catch (e) {
+        return null;
+      }
+    }
   </script>
 </body>
 </html>
