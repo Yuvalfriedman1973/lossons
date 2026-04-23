@@ -351,6 +351,40 @@
     /* ── Step 4: Wire up initMainView ── */
     let allTopics = [];
 
+    function renderSection(title, body) {
+      if (!body) return '';
+      return `
+        <div class="section">
+          <div class="section-title">${escapeHtml(title)}</div>
+          <div class="section-body">${escapeHtml(body)}</div>
+        </div>
+      `;
+    }
+
+    function showView(viewId) {
+      const isMain = viewId === 'view-main';
+      document.getElementById('view-main').classList.toggle('hidden', !isMain);
+      document.getElementById('view-topic').classList.toggle('hidden', isMain);
+      document.getElementById('search').classList.toggle('hidden', !isMain);
+      window.scrollTo(0, 0);
+    }
+
+    function showMainView() {
+      showView('view-main');
+    }
+
+    function showTopicView(topic) {
+      const content = document.getElementById('topic-detail-content');
+      content.innerHTML = `
+        <div class="topic-detail-title">${escapeHtml(topic.title)}</div>
+        <div class="topic-detail-badge">${renderBadge(topic.recurrence_count)}</div>
+        ${renderSection('סיבות', topic.causes)}
+        ${renderSection('מסקנות', topic.conclusions)}
+        ${renderSection('מה יש לעשות', topic.actions)}
+      `;
+      showView('view-topic');
+    }
+
     async function initMainView() {
       const raw = await loadTopics();
       allTopics = raw ? sortTopics(raw) : null;
@@ -377,6 +411,8 @@
     }
 
     initMainView();
+
+    document.getElementById('back-btn').addEventListener('click', showMainView);
   </script>
 </body>
 </html>
