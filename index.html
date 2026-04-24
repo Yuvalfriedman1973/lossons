@@ -259,16 +259,27 @@
       text-align: center;
       transition: background 0.15s;
       -webkit-tap-highlight-color: transparent;
+      position: relative;
     }
 
     .zone-btn:active { background: var(--card-hover); }
 
     .zone-count {
-      display: block;
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-top: 4px;
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid #8fcc6f;
+      color: #8fcc6f;
+      font-size: 18px;
+      font-weight: 700;
+      background: transparent;
     }
   </style>
 </head>
@@ -653,7 +664,7 @@
       ZONES.forEach(zone => {
         const count = (zonesCache[zone.id] || []).length;
         const el = document.getElementById('count-' + zone.id);
-        if (el) el.textContent = count + ' נושאים';
+        if (el) el.textContent = count;
       });
     });
   </script>
