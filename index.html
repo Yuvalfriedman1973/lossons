@@ -272,10 +272,16 @@
       <div class="header">
         <h1>לקחי נהיגה מבצעית בלחימה</h1>
       </div>
-      <div class="zone-list">
-        <button class="zone-btn" data-zone="lebanon">לבנון</button>
-        <button class="zone-btn" data-zone="gaza">עזה</button>
-        <button class="zone-btn" data-zone="syria">סוריה</button>
+      <div style="padding: 12px 20px 0;">
+        <input id="home-search" class="search-bar" type="search" placeholder="חיפוש בכל האזורים..." aria-label="חיפוש בכל האזורים" />
+      </div>
+      <div id="home-search-results" class="topic-list hidden" style="padding: 12px;"></div>
+      <div id="zone-list-container">
+        <div class="zone-list">
+          <button class="zone-btn" data-zone="lebanon">לבנון</button>
+          <button class="zone-btn" data-zone="gaza">עזה</button>
+          <button class="zone-btn" data-zone="syria">סוריה</button>
+        </div>
       </div>
     </div>
 
@@ -317,6 +323,19 @@
       { id: 'syria',   name: 'סוריה', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=1613392289&single=true&output=csv' },
     ];
     let activeZone = null;
+
+    const zonesCache = {};
+    let zonesLoading = false;
+
+    async function loadAllZones() {
+      if (zonesLoading) return;
+      zonesLoading = true;
+      await Promise.all(ZONES.map(async zone => {
+        if (zonesCache[zone.id]) return;
+        const raw = await loadTopics(zone.url);
+        zonesCache[zone.id] = raw ? sortTopics(raw) : [];
+      }));
+    }
 
     function parseCSV(text) {
       const rows = [];
@@ -543,6 +562,67 @@
       }
     });
 
+    function renderHomeResults(query) {
+      const container = document.getElementById('home-search-results');
+      const zoneList = document.getElementById('zone-list-container');
+      if (!query) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        zoneList.classList.remove('hidden');
+        return;
+      }
+      zoneList.classList.add('hidden');
+      const q = query.toLowerCase();
+      const results = [];
+      ZONES.forEach(zone => {
+        const topics = zonesCache[zone.id] || [];
+        topics.forEach(topic => {
+          if ([topic.title, topic.causes, topic.conclusions, topic.actions]
+              .some(f => f.toLowerCase().includes(q))) {
+            results.push({ zone, topic });
+          }
+        });
+      });
+      if (results.length === 0) {
+        container.innerHTML = '<div class="status-msg">אין תוצאות</div>';
+      } else {
+        container.innerHTML = results.map((r, i) => `
+          <div class="topic-card" data-result-index="${i}" role="button" tabindex="0">
+            <span class="topic-card-title">${escapeHtml(r.topic.title)}</span>
+            <span class="badge" style="background:#2a4a7a;color:#b0cfff">${escapeHtml(r.zone.name)}</span>
+            ${renderBadge(r.topic.recurrence_count)}
+            <span class="topic-card-arrow">&#8592;</span>
+          </div>
+        `).join('');
+        container._results = results;
+      }
+      container.classList.remove('hidden');
+    }
+
+    let homeSearchDebounce = null;
+    document.getElementById('home-search').addEventListener('input', e => {
+      const query = e.target.value.trim();
+      clearTimeout(homeSearchDebounce);
+      homeSearchDebounce = setTimeout(async () => {
+        if (query) {
+          await loadAllZones();
+        }
+        renderHomeResults(query);
+      }, 300);
+    });
+
+    document.getElementById('home-search-results').addEventListener('click', e => {
+      const card = e.target.closest('.topic-card');
+      if (!card) return;
+      const idx = parseInt(card.dataset.resultIndex, 10);
+      const results = document.getElementById('home-search-results')._results;
+      if (!results || !results[idx]) return;
+      const { zone, topic } = results[idx];
+      activeZone = zone;
+      document.getElementById('main-header').querySelector('h1').textContent = zone.name;
+      showTopicView(topic);
+    });
+
     // Zone buttons
     document.getElementById('view-home').addEventListener('click', e => {
       const btn = e.target.closest('.zone-btn');
@@ -554,6 +634,8 @@
     document.getElementById('back-home-btn').addEventListener('click', () => {
       showView('view-home');
       document.getElementById('search').value = '';
+      document.getElementById('home-search').value = '';
+      renderHomeResults('');
     });
 
     document.getElementById('back-btn').addEventListener('click', showMainView);
