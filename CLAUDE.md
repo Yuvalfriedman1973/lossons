@@ -85,5 +85,5 @@ All fields are strings except `recurrence_count` (integer, defaults to 1).
 - `.section-actions` has distinct styling: green border + green title background (`#8fcc6f`), dark text
 - `.section-list` renders multi-line action items as a numbered `<ol>`
 - `.hidden` uses `display: none !important`
-- `.zone-count` — subtitle under zone button text showing topic count (block, 14px, muted color)
+- `.zone-count` — circular badge in the bottom-left corner of each zone button showing topic count. Green number (`#8fcc6f`), bold, white background, border color matches `var(--border)` (`#3a5030`), 4.5px border width, 44×44px circle via `border-radius: 50%`. Positioned `absolute` relative to `.zone-btn`.
 - Home screen search results include a `.zone-badge` (blue pill) indicating which zone each result is from
