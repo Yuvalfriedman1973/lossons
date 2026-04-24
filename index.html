@@ -262,6 +262,14 @@
     }
 
     .zone-btn:active { background: var(--card-hover); }
+
+    .zone-count {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -278,9 +286,9 @@
       <div id="home-search-results" class="topic-list hidden" style="padding: 12px;"></div>
       <div id="zone-list-container">
         <div class="zone-list">
-          <button class="zone-btn" data-zone="lebanon">לבנון</button>
-          <button class="zone-btn" data-zone="gaza">עזה</button>
-          <button class="zone-btn" data-zone="syria">סוריה</button>
+          <button class="zone-btn" data-zone="lebanon">לבנון<span class="zone-count" id="count-lebanon"></span></button>
+          <button class="zone-btn" data-zone="gaza">עזה<span class="zone-count" id="count-gaza"></span></button>
+          <button class="zone-btn" data-zone="syria">סוריה<span class="zone-count" id="count-syria"></span></button>
         </div>
       </div>
     </div>
@@ -639,6 +647,15 @@
     });
 
     document.getElementById('back-btn').addEventListener('click', showMainView);
+
+    // Load all zones in background and show topic counts
+    loadAllZones().then(() => {
+      ZONES.forEach(zone => {
+        const count = (zonesCache[zone.id] || []).length;
+        const el = document.getElementById('count-' + zone.id);
+        if (el) el.textContent = count + ' נושאים';
+      });
+    });
   </script>
 </body>
 </html>
