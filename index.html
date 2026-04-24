@@ -232,13 +232,50 @@
 
     /* ── Hidden utility ── */
     .hidden { display: none !important; }
+
+    /* ── Home / Zone selection ── */
+    .zone-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 32px 20px;
+    }
+
+    .zone-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--heading);
+      font-family: 'Heebo', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 24px 20px;
+      cursor: pointer;
+      text-align: right;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .zone-btn:active { background: var(--card-hover); }
   </style>
 </head>
 <body>
   <div class="app">
 
-    <!-- Shared header (single <h1> in DOM); JS toggles #search visibility when switching views -->
-    <div class="header" id="main-header">
+    <!-- Home view -->
+    <div id="view-home">
+      <div class="header">
+        <h1>לקחים חוזרים — נהיגה מבצעית</h1>
+      </div>
+      <div class="zone-list">
+        <button class="zone-btn" data-zone="lebanon">🇱🇧 לבנון</button>
+        <button class="zone-btn" data-zone="gaza">🇵🇸 עזה</button>
+        <button class="zone-btn" data-zone="syria">🇸🇾 סוריה</button>
+      </div>
+    </div>
+
+    <!-- Shared header (main + topic views) -->
+    <div class="header hidden" id="main-header">
       <h1>לקחים חוזרים — נהיגה מבצעית</h1>
       <input
         id="search"
@@ -250,7 +287,7 @@
     </div>
 
     <!-- Main view (no header inside) -->
-    <div id="view-main">
+    <div id="view-main" class="hidden">
       <div id="topic-list" class="topic-list">
         <div class="status-msg">טוען נתונים...</div>
       </div>
@@ -266,7 +303,12 @@
 
   </div>
   <script>
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=0&single=true&output=csv';
+    const ZONES = [
+      { id: 'lebanon', name: 'לבנון', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=0&single=true&output=csv' },
+      { id: 'gaza',    name: 'עזה',   url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=1787717414&single=true&output=csv' },
+      { id: 'syria',   name: 'סוריה', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=1613392289&single=true&output=csv' },
+    ];
+    let activeZone = null;
 
     function parseCSV(text) {
       const rows = [];
@@ -348,9 +390,9 @@
       return topics.filter(t => t.title);
     }
 
-    async function loadTopics() {
+    async function loadTopics(url) {
       try {
-        const res = await fetch(SHEET_CSV_URL);
+        const res = await fetch(url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const text = await res.text();
         const rows = parseCSV(text);
@@ -439,10 +481,11 @@
     }
 
     function showView(viewId) {
-      const isMain = viewId === 'view-main';
-      document.getElementById('view-main').classList.toggle('hidden', !isMain);
-      document.getElementById('view-topic').classList.toggle('hidden', isMain);
-      document.getElementById('search').classList.toggle('hidden', !isMain);
+      ['view-home', 'view-main', 'view-topic'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== viewId);
+      });
+      document.getElementById('main-header').classList.toggle('hidden', viewId === 'view-home');
+      document.getElementById('search').classList.toggle('hidden', viewId !== 'view-main');
       window.scrollTo(0, 0);
     }
 
@@ -462,34 +505,53 @@
       showView('view-topic');
     }
 
-    async function initMainView() {
-      const raw = await loadTopics();
+    async function initMainView(zone) {
+      document.getElementById('main-header').querySelector('h1').textContent = 'לקחים חוזרים — ' + zone.name;
+      showView('view-main');
+      renderMainView([]); // show loading state
+      document.getElementById('topic-list').innerHTML = '<div class="status-msg">טוען נתונים...</div>';
+      const raw = await loadTopics(zone.url);
       allTopics = raw ? sortTopics(raw) : null;
       renderMainView(allTopics || null);
-
-      document.getElementById('search').addEventListener('input', e => {
-        const filtered = filterTopics(allTopics || [], e.target.value.trim());
-        renderMainView(filtered);
-      });
-
-      document.getElementById('topic-list').addEventListener('click', e => {
-        const card = e.target.closest('.topic-card');
-        if (!card) return;
-        const index = parseInt(card.dataset.index, 10);
-        showTopicView(displayedTopics[index]);
-      });
-
-      document.getElementById('topic-list').addEventListener('keydown', e => {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.topic-card')) {
-          e.preventDefault();
-          e.target.closest('.topic-card').click();
-        }
-      });
     }
 
-    initMainView();
+    // Wire up search and card clicks once (not per zone)
+    document.getElementById('search').addEventListener('input', e => {
+      const filtered = filterTopics(allTopics || [], e.target.value.trim());
+      renderMainView(filtered);
+    });
 
-    document.getElementById('back-btn').addEventListener('click', showMainView);
+    document.getElementById('topic-list').addEventListener('click', e => {
+      const card = e.target.closest('.topic-card');
+      if (!card) return;
+      const index = parseInt(card.dataset.index, 10);
+      showTopicView(displayedTopics[index]);
+    });
+
+    document.getElementById('topic-list').addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.topic-card')) {
+        e.preventDefault();
+        e.target.closest('.topic-card').click();
+      }
+    });
+
+    // Zone buttons
+    document.getElementById('view-home').addEventListener('click', e => {
+      const btn = e.target.closest('.zone-btn');
+      if (!btn) return;
+      const zone = ZONES.find(z => z.id === btn.dataset.zone);
+      if (zone) { activeZone = zone; initMainView(zone); }
+    });
+
+    // Back button returns to home when at main view
+    document.getElementById('back-btn').addEventListener('click', () => {
+      if (!document.getElementById('view-main').classList.contains('hidden')) {
+        showView('view-home');
+        document.getElementById('search').value = '';
+      } else {
+        showMainView();
+      }
+    });
   </script>
 </body>
 </html>
