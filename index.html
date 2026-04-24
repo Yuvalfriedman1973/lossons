@@ -288,6 +288,9 @@
 
     <!-- Main view (no header inside) -->
     <div id="view-main" class="hidden">
+      <div style="padding: 10px 12px 0;">
+        <button class="back-btn" id="back-home-btn">&#8594; בחירת אזור</button>
+      </div>
       <div id="topic-list" class="topic-list">
         <div class="status-msg">טוען נתונים...</div>
       </div>
@@ -543,15 +546,12 @@
       if (zone) { activeZone = zone; initMainView(zone); }
     });
 
-    // Back button returns to home when at main view
-    document.getElementById('back-btn').addEventListener('click', () => {
-      if (!document.getElementById('view-main').classList.contains('hidden')) {
-        showView('view-home');
-        document.getElementById('search').value = '';
-      } else {
-        showMainView();
-      }
+    document.getElementById('back-home-btn').addEventListener('click', () => {
+      showView('view-home');
+      document.getElementById('search').value = '';
     });
+
+    document.getElementById('back-btn').addEventListener('click', showMainView);
   </script>
 </body>
 </html>
