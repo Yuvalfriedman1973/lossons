@@ -1,671 +1,1978 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>לקחי נהיגה מבצעית בלחימה</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dolomiti Rifugi Radar | מערכת ניטור והתראות לפי אשכולות</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Heebo & Assistant -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Assistant', 'Heebo', 'sans-serif'],
+            heading: ['Heebo', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    /* ── CSS variables ── */
-    :root {
-      --bg:         #141a0f;
-      --surface:    #4a6535;
-      --card:       #253020;
-      --card-hover: #2e3d28;
-      --border:     #3a5030;
-      --text:       #e8e8e8;
-      --text-muted: #9aaa90;
-      --heading:    #ffffff;
-      --badge-bg:   #8b1a1a;
-      --badge-text: #ffd0d0;
-      --accent:     #5a8a4a;
-      --search-bg:  #1a2214;
-      --section-bg: #1a2214;
-      --back-btn:   #3a5030;
-      --back-hover: #4a6540;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: 'Heebo', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Assistant', sans-serif;
+      background: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(224, 242, 254, 0.6) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(243, 232, 255, 0.5) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(236, 253, 245, 0.4) 0px, transparent 60%);
+      color: #0f172a;
       min-height: 100vh;
-      direction: rtl;
     }
-
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 0 40px;
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    /* ── Header ── */
-    .header {
-      background: var(--surface);
-      border-bottom: 2px solid var(--border);
-      padding: 16px 20px 12px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 9999px;
     }
-
-    .header h1 {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--heading);
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-      text-align: center;
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.35); }
+      50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.15); }
     }
-
-    /* ── Search ── */
-    .search-bar {
-      width: 100%;
-      background: var(--search-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 9px 14px;
-      color: var(--text);
-      font-family: 'Heebo', sans-serif;
-      font-size: 16px; /* ≥16px prevents iOS Safari auto-zoom */
-      direction: rtl;
-      outline: none;
-      -webkit-appearance: none; /* removes iOS Safari system search-input styling */
-      appearance: none;
-    }
-
-    .search-bar::placeholder { color: var(--text-muted); }
-    .search-bar:focus { border-color: var(--accent); }
-
-    /* ── Topic list ── */
-    .topic-list {
-      padding: 16px 12px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .topic-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      cursor: pointer;
-      transition: background 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      -webkit-tap-highlight-color: transparent; /* suppress browser blue tap flash */
-    }
-
-    .topic-card:active { background: var(--card-hover); }
-
-    .topic-card-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--heading);
-      flex: 1;
-      line-height: 1.4;
-    }
-
-    .topic-card-arrow {
-      color: var(--text-muted);
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    /* ── Badge ── */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      background: var(--badge-bg);
-      color: var(--badge-text);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 20px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* ── Topic detail view ── */
-    .view-topic {
-      padding: 0 12px;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--back-btn);
-      color: var(--text);
-      border: none;
-      border-radius: 8px;
-      padding: 9px 14px;
-      font-family: 'Heebo', sans-serif;
-      font-size: 14px;
-      cursor: pointer;
-      margin: 14px 0 16px;
-      transition: background 0.15s;
-      -webkit-tap-highlight-color: transparent; /* suppress browser blue tap flash */
-    }
-
-    .back-btn:active { background: var(--back-hover); }
-
-    .topic-detail-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--heading);
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-
-    .topic-detail-badge {
-      margin-bottom: 18px;
-    }
-
-    .section {
-      background: var(--section-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-
-    .section-body {
-      font-size: 15px;
-      color: var(--text);
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-
-    .section-list {
-      margin: 0;
-      padding-right: 20px;
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
-    .section-list li {
-      margin-bottom: 4px;
-    }
-
-    .section-actions {
-      background: #1a2e1a;
-      border: 2px solid #5a8a4a;
-      border-right: 5px solid #5a8a4a;
-    }
-
-    .section-actions .section-title {
-      color: #1a2e1a;
-      background: #8fcc6f;
-      margin: -14px -16px 12px;
-      padding: 10px 16px;
-      border-radius: 8px 8px 0 0;
-      font-size: 14px;
-    }
-
-    .section-actions .section-list,
-    .section-actions .section-body {
-      color: #f0f0f0;
-      font-weight: 500;
-    }
-
-    /* ── Status messages ── */
-    .status-msg {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-      font-size: 16px;
-    }
-
-    .status-msg.error { color: #e07070; }
-
-    /* ── Hidden utility ── */
-    .hidden { display: none !important; }
-
-    /* ── Home / Zone selection ── */
-    .zone-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 32px 20px;
-    }
-
-    .zone-btn {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--heading);
-      font-family: 'Heebo', sans-serif;
-      font-size: 40px;
-      font-weight: 700;
-      padding: 24px 20px;
-      cursor: pointer;
-      text-align: center;
-      transition: background 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-    }
-
-    .zone-btn:active { background: var(--card-hover); }
-
-    .zone-count {
-      position: absolute;
-      left: 12px;
-      bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 4.5px solid var(--border);
-      color: #8fcc6f;
-      font-size: 18px;
-      font-weight: 700;
-      background: transparent;
+    .status-pulse-open {
+      animation: pulseGlow 1.8s infinite ease-in-out;
     }
   </style>
 </head>
-<body>
-  <div class="app">
+<body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-teal-700 selection:text-white">
 
-    <!-- Home view -->
-    <div id="view-home">
-      <div class="header">
-        <h1>לקחי נהיגה מבצעית בלחימה</h1>
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-300 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-teal-700 to-indigo-600 flex items-center justify-center shadow-md shadow-slate-900/10 text-2xl text-white">
+            🏔️
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950">
+                Dolomiti Rifugi Radar
+              </h1>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-950 border border-orange-300 font-bold">4 אשכולות נבחרים</span>
+            </div>
+            <p class="text-xs text-slate-600 font-medium hidden sm:block">מעקב פתיחת הרשמות, חלוקה ל-4 אשכולות ותחליפים גיאוגרפיים</p>
+          </div>
+        </div>
+
+        <button onclick="openAddHutModal()" class="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-sm transition">
+          <span>➕</span>
+          <span>הוסף</span>
+        </button>
       </div>
-      <div style="padding: 12px 20px 0;">
-        <input id="home-search" class="search-bar" type="search" placeholder="חיפוש בכל האזורים..." aria-label="חיפוש בכל האזורים" />
+
+      <!-- Action Buttons -->
+      <div class="flex items-center flex-wrap gap-2 w-full md:w-auto justify-end">
+        <button id="btn-email-settings" onclick="openEmailModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs sm:text-sm font-bold transition text-rose-800 shadow-sm">
+          <span>✉️</span>
+          <span>התראות Gmail</span>
+        </button>
+
+        <button id="btn-telegram-settings" onclick="openTelegramModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-300 text-xs sm:text-sm font-bold transition text-sky-800 shadow-sm">
+          <span>✈️</span>
+          <span class="hidden sm:inline">טלגרם</span>
+        </button>
+
+        <button onclick="openExportModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs sm:text-sm font-bold transition text-slate-800 shadow-sm">
+          <span>⚙️</span>
+          <span class="hidden sm:inline">קוד ענן (24/7)</span>
+        </button>
+
+        <button onclick="openAddHutModal()" class="hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-900/20 transition">
+          <span>➕</span>
+          <span>הוסף בקתה</span>
+        </button>
       </div>
-      <div id="home-search-results" class="topic-list hidden" style="padding: 12px;"></div>
-      <div id="zone-list-container">
-        <div class="zone-list">
-          <button class="zone-btn" data-zone="lebanon">לבנון<span class="zone-count" id="count-lebanon"></span></button>
-          <button class="zone-btn" data-zone="gaza">עזה<span class="zone-count" id="count-gaza"></span></button>
-          <button class="zone-btn" data-zone="syria">סוריה<span class="zone-count" id="count-syria"></span></button>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+
+    <!-- KPI / Status Counter Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-slate-200 border-2 border-slate-400 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-xs sm:text-sm text-slate-800 font-bold block">סה"כ בקתות באשכולות</span>
+          <span id="stat-total" class="text-2xl sm:text-3xl font-black text-slate-950 mt-1 block">18</span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-slate-300 border border-slate-400 flex items-center justify-center text-xl text-slate-900 shadow-inner">
+          📍
+        </div>
+      </div>
+
+      <div class="bg-emerald-100 border-2 border-emerald-500 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-xs sm:text-sm text-emerald-950 font-bold block">הרשמה פתוחה!</span>
+          <span id="stat-open" class="text-2xl sm:text-3xl font-black text-emerald-900 mt-1 block">0</span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-200 border border-emerald-400 flex items-center justify-center text-xl text-emerald-950 shadow-inner">
+          🟢
+        </div>
+      </div>
+
+      <div class="bg-amber-100 border-2 border-amber-500 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-xs sm:text-sm text-amber-950 font-bold block">ממתינות לפתיחה</span>
+          <span id="stat-closed" class="text-2xl sm:text-3xl font-black text-amber-950 mt-1 block">18</span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-200 border border-amber-400 flex items-center justify-center text-xl text-amber-950 shadow-inner">
+          ⏳
+        </div>
+      </div>
+
+      <div class="bg-slate-200 border-2 border-slate-400 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-xs sm:text-sm text-slate-800 font-bold block">בדיקה אחרונה</span>
+          <span id="stat-last-checked" class="text-sm sm:text-base font-bold text-slate-950 mt-1 block">עכשיו</span>
+          <span id="auto-check-timer" class="text-[11px] text-teal-950 font-mono font-black">סבב בעוד 15:00</span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-slate-300 border border-slate-400 flex items-center justify-center text-xl text-sky-900 shadow-inner">
+          ⏱️
         </div>
       </div>
     </div>
 
-    <!-- Shared header (main + topic views) -->
-    <div class="header hidden" id="main-header">
-      <h1>לקחי נהיגה מבצעית בלחימה</h1>
-      <input
-        id="search"
-        class="search-bar"
-        type="search"
-        placeholder="חיפוש..."
-        aria-label="חיפוש בלקחים"
-      />
+    <!-- Cluster Navigation Tabs & Quick Action Bar -->
+    <div class="bg-white border-2 border-slate-300 rounded-2xl p-4 space-y-3.5 shadow-sm">
+      
+      <!-- Top Row: Global actions -->
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-check-all" onclick="checkAllHuts()" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs sm:text-sm shadow-md transition">
+            <svg id="spinner-check-all" class="w-4 h-4 hidden animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span id="text-check-all">סרוק את כל 18 הבקתות</span>
+            <span>⚡</span>
+          </button>
+
+          <button onclick="simulateOpenAlert()" title="הדמיית התראה מתפרצת" class="px-3 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 text-xs sm:text-sm text-amber-950 font-bold transition flex items-center gap-1.5 shadow-sm">
+            <span>🚨</span>
+            <span>הדמיית התראה</span>
+          </button>
+
+          <button onclick="playNotificationChime()" title="בדיקת צליל פעמון" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs sm:text-sm text-slate-800 font-bold transition flex items-center gap-1.5">
+            <span>🔔</span>
+            <span class="hidden sm:inline">צליל פעמון</span>
+          </button>
+
+          <button onclick="requestBrowserPermission()" id="btn-perm" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs sm:text-sm text-slate-800 font-bold transition flex items-center gap-1.5">
+            <span>📢</span>
+            <span class="hidden sm:inline">התראות דפדפן</span>
+          </button>
+        </div>
+
+        <!-- Search & Status filter -->
+        <div class="flex items-center gap-2 w-full lg:w-auto">
+          <div class="relative flex-grow lg:w-64">
+            <input type="text" id="search-input" oninput="renderHuts()" placeholder="חיפוש בקתה או אזור..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 pr-9 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-700 focus:ring-1 focus:ring-teal-700 transition font-medium">
+            <span class="absolute right-3 top-2.5 text-slate-400 text-sm">🔍</span>
+          </div>
+          <select id="status-filter" onchange="renderHuts()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700 shrink-0">
+            <option value="ALL">כל הסטטוסים</option>
+            <option value="OPEN">פתוח בלבד 🟢</option>
+            <option value="CLOSED">ממתין לפתיחה ⏳</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Cluster Selection Tabs -->
+      <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+        <span class="text-xs font-black text-slate-700 ml-2">סינון תצוגה:</span>
+        <button onclick="setClusterFilter('ALL')" id="tab-all" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-slate-800 text-white border-slate-900 shadow-sm">
+          כל 4 האשכולות (18)
+        </button>
+        <button onclick="setClusterFilter('PRIMARY_ONLY')" id="tab-primary" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-amber-50 hover:bg-amber-100 text-amber-950 border-amber-300">
+          👑 4 בחירות ראשיות (Lagazuoi, Averau, Fiume, Sabe)
+        </button>
+        <button onclick="setClusterFilter('LAGAZUOI')" id="tab-lagazuoi" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-sky-50 hover:bg-sky-100 text-sky-950 border-sky-300">
+          🔵 לגאזואי (2)
+        </button>
+        <button onclick="setClusterFilter('AVERAU')" id="tab-averau" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-purple-50 hover:bg-purple-100 text-purple-950 border-purple-300">
+          🟣 אבראו (7)
+        </button>
+        <button onclick="setClusterFilter('FIUME')" id="tab-fiume" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300">
+          🟢 פיומה (3)
+        </button>
+        <button onclick="setClusterFilter('SABE')" id="tab-sabe" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-orange-50 hover:bg-orange-100 text-orange-950 border-orange-300">
+          🟠 סאבה / פסקול (6)
+        </button>
+      </div>
     </div>
 
-    <!-- Main view (no header inside) -->
-    <div id="view-main" class="hidden">
-      <div style="padding: 10px 12px 0;">
-        <button class="back-btn" id="back-home-btn">בחזרה</button>
-      </div>
-      <div id="topic-list" class="topic-list">
-        <div class="status-msg">טוען נתונים...</div>
-      </div>
+    <!-- Clusters Container - Grouped by 4 distinct geographical areas -->
+    <div id="clusters-container" class="space-y-8">
+      <!-- Cluster sections rendered via JavaScript -->
     </div>
 
-    <!-- Topic detail view (no header inside) -->
-    <div id="view-topic" class="hidden">
-      <div class="view-topic">
-        <button class="back-btn" id="back-btn">בחזרה</button>
-        <div id="topic-detail-content"></div>
-      </div>
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-16 bg-white border-2 border-slate-300 rounded-2xl shadow-sm">
+      <div class="text-5xl mb-3">🏔️</div>
+      <h3 class="text-lg font-black text-slate-900">לא נמצאו בקתות תואמות לסינון</h3>
+      <p class="text-sm text-slate-600 mt-1">נסה לשנות את מונח החיפוש או ללחוץ על 'כל 4 האשכולות'.</p>
     </div>
 
+    <!-- Activity Log Panel -->
+    <div class="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">📜</span>
+          <h2 class="text-base font-black text-slate-950">יומן פעילות וסריקה בזמן אמת</h2>
+        </div>
+        <button onclick="clearActivityLog()" class="text-xs text-slate-600 hover:text-slate-950 underline font-bold">נקה יומן</button>
+      </div>
+      <div id="activity-log" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar text-xs font-mono">
+        <!-- Log entries -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Add / Edit Hut -->
+  <div id="modal-hut" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <button onclick="closeModal('modal-hut')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 id="modal-hut-title" class="text-xl font-black font-heading text-slate-950 mb-4 flex items-center gap-2">
+        <span>➕</span> הוספת בקתה חדשה לניטור
+      </h3>
+
+      <form id="form-hut" onsubmit="handleHutSubmit(event)" class="space-y-3.5">
+        <input type="hidden" id="hut-id">
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">שם הבקתה</label>
+          <input type="text" id="hut-name" required placeholder="למשל: Ristoro Sabe" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">אשכול / שיוך גיאוגרפי</label>
+            <select id="hut-cluster" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700">
+              <option value="LAGAZUOI">🔵 אשכול לגאזואי (Passo Falzarego)</option>
+              <option value="AVERAU">🟣 אשכול אבראו (5 Torri / Passo Giau)</option>
+              <option value="FIUME">🟢 אשכול פיומה (Monte Pelmo / Val Fiorentina)</option>
+              <option value="SABE">🟠 אשכול סאבה (Pescul / Monte Fertazza)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">סוג עדיפות</label>
+            <select id="hut-is-primary" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700">
+              <option value="false">🔄 תחליף ישיר</option>
+              <option value="true">👑 בחירה ראשונה (עדיפות עליונה)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">אזור בדולומיטים</label>
+            <input type="text" id="hut-region" required placeholder="Pescul / Selva di Cadore" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">גובה (מטרים)</label>
+            <input type="number" id="hut-altitude" placeholder="1408" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-amber-900 mb-1">🧭 קשר גיאוגרפי (הסבר עבור מי התחליף ומה המרחק)</label>
+          <input type="text" id="hut-substitute-info" placeholder="למשל: תחנת אמצע ברכבל / 40 דק' הליכה בשביל 561" class="w-full bg-amber-50/60 border border-amber-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-amber-600 focus:bg-white font-medium">
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-sky-900 mb-1">📏 מרחק וזמן הגעה מבקתת היעד</label>
+          <input type="text" id="hut-distance" placeholder="למשל: 3.5 ק&quot;מ (שעה ורבע עלייה רגלית / רכבל)" class="w-full bg-sky-50/70 border border-sky-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-sky-600 focus:bg-white font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-800 mb-1">📅 צפי פתיחת הרשמה (חלון זמן משוער)</label>
+          <input type="text" id="hut-expected-opening" placeholder="למשל: ינואר – פברואר" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">כתובת אתר דף ההרשמה / הזמנות (URL)</label>
+          <input type="url" id="hut-url" required placeholder="https://..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-mono text-xs">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">הערות ומידע נוסף</label>
+          <input type="text" id="hut-notes" placeholder="פרטים על ההזמנה, קיבולת, חדרים וכד'..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">מילות מפתח שמעידות על פתיחה</label>
+          <input type="text" id="hut-keywords" value="Prenota, Book Now, Disponibile, Available, Prenotazioni aperte" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+        </div>
+
+        <div class="pt-3 flex justify-end gap-3">
+          <button type="button" onclick="closeModal('modal-hut')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold">ביטול</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm shadow-md">שמור בקתה</button>
+        </div>
+      </form>
+    </div>
   </div>
+
+  <!-- Modal: Telegram Bot Settings -->
+  <div id="modal-telegram" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative">
+      <button onclick="closeModal('modal-telegram')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 class="text-xl font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
+        <span>✈️</span> הגדרת התראות לטלגרם
+      </h3>
+      <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
+        התראות מתפרצות (Push) ישירות לנייד ברגע שנפתחת הרשמה לאחת הבקתות.
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">Telegram Bot Token</label>
+          <input type="text" id="tg-token" placeholder="למשל: 123456789:ABCdefGhIJKlmNoPQ..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-teal-700 focus:bg-white">
+          <span class="text-[11px] text-slate-500">מופקים מ-@BotFather בטלגרם.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">Telegram Chat ID</label>
+          <input type="text" id="tg-chat-id" placeholder="למשל: 987654321" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-teal-700 focus:bg-white">
+          <span class="text-[11px] text-slate-500">ה-Chat ID שלך מ-@userinfobot.</span>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="testTelegramNotification()" id="btn-test-tg" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sky-800 font-bold text-xs border border-slate-300 transition">
+            שלח הודעת ניסיון ✈️
+          </button>
+          <button onclick="saveTelegramSettings()" class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-md transition">
+            שמור הגדרות
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Email (Gmail) Settings -->
+  <div id="modal-email" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative">
+      <button onclick="closeModal('modal-email')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 class="text-xl font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
+        <span>✉️</span> התראות Gmail (kzyuval@gmail.com)
+      </h3>
+      <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
+        ברגע שהמערכת מזהה פתיחת הרשמה (באשכול או בתחליף), ישלח מייל מיידי עם קישור ישיר.
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">כתובת דוא"ל יעד</label>
+          <input type="email" id="target-email" value="kzyuval@gmail.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-rose-500 focus:bg-white font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">מפתח Web3Forms (למשלוח ישיר ושקט מהדפדפן)</label>
+          <input type="text" id="email-api-key" placeholder="אופציונלי: Access Key מ-web3forms.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-rose-500 focus:bg-white">
+          <span class="text-[11px] text-slate-500">במידה ואין מפתח, ייפתח ישירות חלון יצירת מייל ב-Gmail.</span>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="sendTestEmail()" id="btn-test-email" class="px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md">
+            <span>🚀</span> שלח מייל בדיקה עכשיו
+          </button>
+          <button onclick="saveEmailSettings()" class="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-md transition">
+            שמור הגדרות
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Export GitHub Actions & Python -->
+  <div id="modal-export" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <button onclick="closeModal('modal-export')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 class="text-xl font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
+        <span>⚙️</span> הפעלה אוטומטית 24/7 בענן בחינם
+      </h3>
+      <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
+        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 18 הבקתות ב-4 האשכולות.
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-teal-800">1. סקריפט הסריקה המלא (rifugi_checker.py)</span>
+            <button onclick="copyCode('code-python')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold">העתק קוד</button>
+          </div>
+          <pre id="code-python" class="bg-slate-950 p-3 rounded-xl text-[11px] font-mono text-slate-100 overflow-x-auto border border-slate-800 max-h-48 custom-scrollbar" dir="ltr"></pre>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-teal-800">2. הגדרת ריצה אוטומטית (.github/workflows/monitor.yml)</span>
+            <button onclick="copyCode('code-yaml')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold">העתק YAML</button>
+          </div>
+          <pre id="code-yaml" class="bg-slate-950 p-3 rounded-xl text-[11px] font-mono text-slate-100 overflow-x-auto border border-slate-800 max-h-48 custom-scrollbar" dir="ltr"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Direct Link Fallback (Iframe Safe) -->
+  <div id="modal-link" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative">
+      <button onclick="closeModal('modal-link')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 id="modal-link-title" class="text-lg font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
+        <span>🌐</span> קישור לאתר הבקתה
+      </h3>
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+          <input type="text" id="modal-link-input" readonly class="w-full bg-transparent text-xs text-teal-900 font-mono font-bold outline-none">
+          <button onclick="copyModalLink()" class="px-3 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shrink-0 transition flex items-center gap-1 shadow-sm">
+            <span>📋</span> העתק
+          </button>
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="closeModal('modal-link')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">סגור</button>
+          <a id="modal-link-anchor" href="#" target="_blank" rel="noopener noreferrer" class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm">
+            <span>🔗</span> פתח בלשונית חדשה
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-5 left-5 z-50 space-y-2 pointer-events-none"></div>
+
   <script>
-    const ZONES = [
-      { id: 'lebanon', name: 'לבנון', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=0&single=true&output=csv' },
-      { id: 'gaza',    name: 'עזה',   url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=1787717414&single=true&output=csv' },
-      { id: 'syria',   name: 'סוריה', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU3T8932BlscRE4i9IxwNE2gntwny714mhYASMdp_h_2MHlN2kFFIesbCLiwgP_ZnVcSbilm2-BxSj/pub?gid=1613392289&single=true&output=csv' },
+    const memoryStore = {};
+    const safeStorage = {
+      get: (key) => {
+        try {
+          return localStorage.getItem(key);
+        } catch (e) {
+          return memoryStore[key] || null;
+        }
+      },
+      set: (key, value) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch (e) {
+          memoryStore[key] = String(value);
+        }
+      }
+    };
+
+    // 4 Primary Clusters Meta Definitions
+    const CLUSTERS_CONFIG = {
+      LAGAZUOI: {
+        id: 'LAGAZUOI',
+        name: 'אשכול 1: לגאזואי (Passo Falzarego)',
+        badge: '🔵 אשכול לגאזואי',
+        description: 'רכס לגאזואי ומעבר פלצרגו. אם לגאזואי בפסגה מלאה, קול גאלינה במעבר היא נקודת הלינה הישירה ביותר ממנה עולים ברכבל תוך דקות.',
+        themeClasses: {
+          wrapper: 'bg-sky-50/90 border-2 border-sky-400',
+          headerBg: 'bg-gradient-to-r from-sky-700 to-teal-700 text-white',
+          primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
+          substituteCard: 'bg-white border-2 border-sky-300 hover:border-sky-500 shadow-sm'
+        }
+      },
+      AVERAU: {
+        id: 'AVERAU',
+        name: 'אשכול 2: אבראו (5 Torri / Passo Giau)',
+        badge: '🟣 אשכול אבראו',
+        description: 'מתחם 5 Torri ומעבר ג\'יאו. כל הבקתות באשכול זה מחוברות בשבילי הליכה קצרים (15-30 דק\') או ברכבל ישיר לאבראו.',
+        themeClasses: {
+          wrapper: 'bg-purple-50/90 border-2 border-purple-400',
+          headerBg: 'bg-gradient-to-r from-purple-800 to-indigo-800 text-white',
+          primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
+          substituteCard: 'bg-white border-2 border-purple-300 hover:border-purple-500 shadow-sm'
+        }
+      },
+      FIUME: {
+        id: 'FIUME',
+        name: 'אשכול 3: פיומה (Monte Pelmo / Val Fiorentina)',
+        badge: '🟢 אשכול פיומה',
+        description: 'מרגלות המונטה פלמו (Monte Pelmo). בקתת פיומה קטנה ואינטימית (20 מיטות בלבד!). ריפוג\'ו פאסו סטאולנצה נמצאת במרחק שעה ורבע הליכה קלה בלבד בשביל 472 ומהווה את התחליף המדויק ביותר בציר ה-Alta Via 1.',
+        themeClasses: {
+          wrapper: 'bg-emerald-50/90 border-2 border-emerald-400',
+          headerBg: 'bg-gradient-to-r from-emerald-800 to-teal-800 text-white',
+          primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
+          substituteCard: 'bg-white border-2 border-emerald-300 hover:border-emerald-500 shadow-sm'
+        }
+      },
+      SABE: {
+        id: 'SABE',
+        name: 'אשכול 4: סאבה (Pescul / Monte Fertazza)',
+        badge: '🟠 אשכול סאבה',
+        description: 'עמק ואל פיורנטינה ורכס פרטצה (Fertazza). בקתת היעד Ristoro Sabe ממוקמת בתחנת הרכבל בפסקול. התחליפים מקיפים את מעלה הרכס והעמק הסמוך.',
+        themeClasses: {
+          wrapper: 'bg-orange-50/90 border-2 border-orange-400',
+          headerBg: 'bg-gradient-to-r from-amber-700 to-orange-700 text-white',
+          primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
+          substituteCard: 'bg-white border-2 border-orange-300 hover:border-orange-500 shadow-sm'
+        }
+      }
+    };
+
+    // Strictly 18 Huts belonging exclusively to the 4 clusters
+    const INITIAL_HUTS = [
+      // --- CLUSTER 1: LAGAZUOI (2) ---
+      {
+        id: 'lagazuoi',
+        name: 'Rifugio Lagazuoi',
+        cluster: 'LAGAZUOI',
+        isPrimary: true,
+        priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
+        distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
+        substituteInfo: 'בקתת היעד בפסגה (מרפסת פנורמית וסאונה)',
+        region: 'Passo Falzarego / Cortina',
+        altitude: 2752,
+        url: 'https://www.rifugiolagazuoi.com',
+        status: 'CLOSED',
+        expectedOpening: 'אמצע אוקטובר – תחילת נובמבר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book Now, Disponibile, Available, Booking Open',
+        lastSnippet: 'Winter bookings only. Summer reservations typically open Oct/Nov.',
+        notes: 'הבקתה המבוקשת ביותר. נפתחת ראשונה ונחטפת תוך ימים ספורים!'
+      },
+      {
+        id: 'col_gallina',
+        name: 'Rifugio Col Gallina',
+        cluster: 'LAGAZUOI',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Lagazuoi',
+        distanceFromPrimary: '3.5 ק"מ (כשעתיים הליכה בשביל 401/402, או 3 דק\' ברכבל ישיר ממעבר פלצרגו)',
+        substituteInfo: 'למרגלות הרכס במעבר פלצרגו – רכבל ישיר בבוקר ללגאזואי',
+        region: 'Passo Falzarego / Cortina',
+        altitude: 2055,
+        url: 'https://rifugiocolgallina.com/',
+        status: 'CLOSED',
+        expectedOpening: 'נובמבר – דצמבר (נגיש לכביש)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book Now, Booking, Camere, Disponibile',
+        lastSnippet: 'פועל בחורף ובקיץ, פותח חלון הרשמות מוקדם בסוף הסתיו.',
+        notes: 'במעבר פלצרגו. גישה נוחה ישירות מהכביש ונקודת יציאה מושלמת לרכס לגאזואי.'
+      },
+
+      // --- CLUSTER 2: AVERAU (7) ---
+      {
+        id: 'averau',
+        name: 'Rifugio Averau',
+        cluster: 'AVERAU',
+        isPrimary: true,
+        priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
+        distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
+        substituteInfo: 'בקתת היעד באוכף נובולאו (מסעדת גורמה מפורסמת וחדרים משודרגים)',
+        region: '5 Torri / Forcella Nuvolau',
+        altitude: 2413,
+        url: 'https://www.rifugioaverau.it/en/',
+        status: 'CLOSED',
+        expectedOpening: 'אמצע ינואר – תחילת פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Book, Prenota, Disponibile, Available, Camere, Rooms',
+        lastSnippet: 'מסעדת גורמה וחדרי אירוח אלפיניים מול ה-5 Torri והמרמולדה.',
+        notes: 'בגובה 2,413 מ\' באוכף נובולאו. מפורסמת במטבח המשובח, מרפסת שמש פנורמית לצ\'יווטה וחדרי לינה חדשים.'
+      },
+      {
+        id: 'nuvolau',
+        name: 'Rifugio Nuvolau',
+        cluster: 'AVERAU',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Averau',
+        distanceFromPrimary: '1.2 ק"מ (25 דקות הליכה בשביל 439, עלייה של 162 מ\')',
+        substituteInfo: '25 דקות הליכה בלבד מעל אבראו באותו רכס בדיוק!',
+        region: 'Cinque Torri / Cortina',
+        altitude: 2575,
+        url: 'https://www.rifugionuvolau.it',
+        status: 'CLOSED',
+        expectedOpening: 'אמצע ינואר (10–20 בינואר)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Booking, Open, Disponibile',
+        lastSnippet: 'סגור בעונת הסתיו. פרטים והרשמות לקיץ עולים בינואר.',
+        notes: 'הבקתה הוותיקה ביותר באזור קורטינה (1883), תצפית 360 מעלות פנורמית.'
+      },
+      {
+        id: 'scoiattoli',
+        name: 'Rifugio Scoiattoli',
+        cluster: 'AVERAU',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Averau',
+        distanceFromPrimary: '1.0 ק"מ (20 דקות הליכה בשביל 439, ירידה של 158 מ\')',
+        substituteInfo: '20 דקות הליכה מתחת לאבראו, למרגלות צוקי ה-5 Torri',
+        region: '5 Torri / Cortina',
+        altitude: 2255,
+        url: 'http://www.rifugioscoiattoli.it/',
+        status: 'CLOSED',
+        expectedOpening: 'תחילת ינואר (1–10 בינואר)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenotazioni, Book, Booking, Camere, Open',
+        lastSnippet: 'הזמנות קיץ מתחילות בתחילת השנה האזרחית.',
+        notes: 'בלב מתחם ה-5 Torri עם אמבט עץ חם תחת כיפת השמיים ותצפית ישירה לצוקים.'
+      },
+      {
+        id: 'cinque_torri',
+        name: 'Rifugio 5 Torri',
+        cluster: 'AVERAU',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Averau',
+        distanceFromPrimary: '1.8 ק"מ (35-40 דקות הליכה בשבילים 439 ו-440)',
+        substituteInfo: 'למרגלות ה-5 Torri, כ-30 דקות הליכה מאבראו',
+        region: '5 Torri / Cortina',
+        altitude: 2137,
+        url: 'https://www.rifugio5torri.it/home.html',
+        status: 'CLOSED',
+        expectedOpening: 'אמצע ינואר – תחילת פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota ora, Book now, Disponibile, Booking',
+        lastSnippet: 'מייל הזמנות: info@rifugio5torri.it (מענה מתחיל בינואר).',
+        notes: 'בקתה אותנטית למרגלות ה-5 Torri, פופולרית מאוד בקרב צועדי Alta Via 1.'
+      },
+      {
+        id: 'fedare',
+        name: 'Rifugio Fedare',
+        cluster: 'AVERAU',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Averau',
+        distanceFromPrimary: '2.2 ק"מ (45-50 דק\' ברגל בשביל 464, או 8 דק\' ברכבל כיסאות ישיר!)',
+        substituteInfo: 'רכבל כיסאות ישיר עולה מפדארה ישר למרפסת של אבראו!',
+        region: 'Passo Giau / Colle Santa Lucia',
+        altitude: 2000,
+        url: 'http://www.rifugiofedare.it/',
+        status: 'CLOSED',
+        expectedOpening: 'דצמבר – תחילת ינואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenotazione, Book, Disponibile, Camere',
+        lastSnippet: 'ממתין לסריקת תחילת עונה בדצמבר.',
+        notes: 'למרגלות מעבר ג\'יאו עם רכבל כיסאות ישיר לרכס נובולאו/אווראו ומטבח משובח.'
+      },
+      {
+        id: 'passo_giau_hotel',
+        name: 'Berghotel Passo Giau',
+        cluster: 'AVERAU',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Averau (מעבר ג\'יאו)',
+        distanceFromPrimary: '3.8 ק"מ (שעה ו-20 דקות הליכה בשביל 452/464)',
+        substituteInfo: 'בפסגת מעבר ג\'יאו הסמוך – סיום אלטרנטיבי לאותו יום הליכה',
+        region: 'Passo Giau (2236m)',
+        altitude: 2236,
+        url: 'https://www.passogiau.it/en/',
+        status: 'CLOSED',
+        expectedOpening: 'אוקטובר – נובמבר (6 חדרים בלבד)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Book, Reservations, Prenotazioni, Rooms, Availability',
+        lastSnippet: 'מלון בוטיק הררי בפסגת מעבר ג\'יאו. מומלץ לבדוק ישירות: info@passogiau.it',
+        notes: 'נוף פנורמי מדהים של 360 מעלות בפסגת מעבר ג\'יאו. ישנם 6 חדרים בלבד ולכן נתפס במהירות שיא.'
+      },
+      {
+        id: 'malga_giau',
+        name: 'Malga Giau',
+        cluster: 'AVERAU',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Averau (חווה כפרית)',
+        distanceFromPrimary: '4.8 ק"מ (כשעתיים הליכה בשביל 436/452, או 8 דק\' נסיעה לפדארה)',
+        substituteInfo: '1.5 ק"מ מתחת לפאסו ג\'יאו, מתאים אם הכל תפוס למעלה',
+        region: 'Passo Giau / San Vito di Cadore',
+        altitude: 2005,
+        url: 'https://www.malgagiau.it/',
+        status: 'CLOSED',
+        expectedOpening: 'פברואר – מרץ (עונתי כפרי)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenotazioni, Booking, Tavoli, Camere, Aperto',
+        lastSnippet: 'חווה אלפינית הפותחת קבלת אורחים לקראת האביב.',
+        notes: 'חווה אלפינית אותנטית בדרך למעבר ג\'יאו, מתמחה בגבינות מקומיות ואירוח כפרי.'
+      },
+
+      // --- CLUSTER 3: FIUME (3) ---
+      {
+        id: 'citta_di_fiume',
+        name: 'Rifugio Città di Fiume',
+        cluster: 'FIUME',
+        isPrimary: true,
+        priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
+        distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
+        substituteInfo: 'בקתת היעד למרגלות המונטה פלמו (20 מיטות בלבד ב-4 חדרים – נחטפת במהירות!)',
+        region: 'Monte Pelmo / Val Fiorentina',
+        altitude: 1918,
+        url: 'https://rifugiocittadifiume.it/prenota/',
+        status: 'CLOSED',
+        expectedOpening: 'סוף ינואר – תחילת פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Disponibile, Book, Richiesta, Available, Estate',
+        lastSnippet: 'בקתה אינטימית של מועדון CAI Fiume עם נוף מדהים לפלמו ולצ\'יווטה.',
+        notes: '20 מיטות בלבד! אחת הנקודות היפות והפופולריות ב-Alta Via 1. חובה לתפוס מיד עם פתיחת ההרשמה.'
+      },
+      {
+        id: 'passo_staulanza',
+        name: 'Rifugio Passo Staulanza',
+        cluster: 'FIUME',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Città di Fiume',
+        distanceFromPrimary: '4.2 ק"מ (שעה ורבע הליכה מתונה וקלה בשביל 472 ללא הפרשי גובה חדים)',
+        substituteInfo: 'שעה ורבע הליכה קלה בלבד בשביל 472 מפיומה! (במעבר סטאולנצה על ציר AV1)',
+        region: 'Passo Staulanza (1766m)',
+        altitude: 1766,
+        url: 'https://www.staulanza.it/',
+        status: 'CLOSED',
+        expectedOpening: 'דצמבר – תחילת ינואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Camere, Booking, Disponibile, Richiesta',
+        lastSnippet: 'התחליף הקלאסי של אלטה ויה 1 אם פיומה מלאה. נגיש גם לרכב.',
+        notes: 'במעבר סטאולנצה. מסעדה הררית משובחת, חדרים מרווחים ונקודת המשך מושלמת לקבוצת צ\'יווטה.'
+      },
+      {
+        id: 'rifugio_venezia',
+        name: 'Rifugio Venezia (Pelmo)',
+        cluster: 'FIUME',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Città di Fiume (מזרח פלמו)',
+        distanceFromPrimary: '5.5 ק"מ (כשעתיים ו-15 דק\' הליכה בשביל 472 העוקף את המונטה פלמו)',
+        substituteInfo: 'בצד המזרחי של המונטה פלמו, מחוברת בשביל 472 העוקף את הפלמו',
+        region: 'Monte Pelmo / Passo Rutorto',
+        altitude: 1946,
+        url: 'https://www.rifugiovenezia.it/',
+        status: 'CLOSED',
+        expectedOpening: 'ינואר – פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book, Open, Disponibile',
+        lastSnippet: 'הבקתה הראשונה שנבנתה בצד האיטלקי של הדולומיטים (1892).',
+        notes: 'תצפית נהדרת על עמק קאדורה והאנטלאו, גיבוי מעולה למקרה שאין מקום בפיומה.'
+      },
+
+      // --- CLUSTER 4: SABE (6) ---
+      {
+        id: 'ristoro_sabe',
+        name: 'Ristoro Sabe',
+        cluster: 'SABE',
+        isPrimary: true,
+        priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
+        distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
+        substituteInfo: 'בקתת היעד בפסקול (Pescul) למרגלות רכס פרטצה (1,408 מ\')',
+        region: 'Pescul / Selva di Cadore',
+        altitude: 1408,
+        url: 'https://www.fertazza.it/it/servizi-sul-comprensorio-fertazza/rifugio-sabe',
+        status: 'CLOSED',
+        expectedOpening: 'ינואר – פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book, Disponibile, Ristoro, Camere, Aperto',
+        lastSnippet: 'ממוקמת בתחנת היציאה של רכבל Pescul-Fertazza בואל פיורנטינה.',
+        notes: 'בקתת היעד של העמק. נקודת מפתח ביציאה לעלייה לכיוון פרטצה וציר הצ\'יווטה.'
+      },
+      {
+        id: 'ristoro_fertazza',
+        name: 'Ristoro Fertazza',
+        cluster: 'SABE',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר ל-Sabe (רכס פרטצה)',
+        distanceFromPrimary: '3.5 ק"מ (כשעה ורבע עלייה רגלית בשביל 561, או 8 דק\' ברכבל ישיר מ-Pescul)',
+        substituteInfo: 'תחנת האמצע של הרכבל מעל Sabe עם נוף פנורמי מרהיב למונטה פלמו',
+        region: 'Monte Fertazza (1852m)',
+        altitude: 1852,
+        url: 'https://valfiorentinadolomiti.it/it/Ristoro-Fertazza/Home_Ristoro_Fertazza/Benvenuti-Rifugio-Fertazza.html',
+        status: 'CLOSED',
+        expectedOpening: 'דצמבר – תחילת ינואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Camere, Book, Disponibile, Info',
+        lastSnippet: 'בגובה 1,852 מ\' מול המונטה פלמו, עם סולריום ומטבח מסורתי.',
+        notes: 'בקתה ומסעדה אלפינית מומלצת. יושבת ממש על ציר העלייה מרכבל פסקול.'
+      },
+      {
+        id: 'la_ciasela',
+        name: 'Ristoro La Ciasela',
+        cluster: 'SABE',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Sabe (שביל 568)',
+        distanceFromPrimary: '3.0 ק"מ (כשעה עלייה רגלית בשביל 568 מ-Pescul לכיוון Malga Fontanafreda)',
+        substituteInfo: 'בקתה כפרית מקסימה על שביל 568 מול נוף הפלמו והצ\'יווטה',
+        region: 'Monte Fertazza / Selva di Cadore',
+        altitude: 1800,
+        url: 'https://www.valfiorentina.it/',
+        status: 'CLOSED',
+        expectedOpening: 'ינואר – פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenotazioni, Booking, Disponibile, Ristoro',
+        lastSnippet: 'נקודת עצירה פנורמית פופולרית בדרך לפסגת פרטצה.',
+        notes: 'מתאימה במיוחד לעצירה ואירוח באווירה אלפינית שלווה על מדרונות פרטצה.'
+      },
+      {
+        id: 'rifugio_salander',
+        name: 'Rifugio Salander',
+        cluster: 'SABE',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Sabe (Forcella Pecol)',
+        distanceFromPrimary: '2.2 ק"מ (כ-45 דקות הליכה מתונה בשביל 561 מ-Pescul)',
+        substituteInfo: 'על צלע הרכס בשביל 561 היורד ממעבר Pecol ישירות לפסקול',
+        region: 'Forcella Pecol / Pescul',
+        altitude: 1657,
+        url: 'https://www.valfiorentina.it/',
+        status: 'CLOSED',
+        expectedOpening: 'דצמבר – ינואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book, Camere, Disponibile',
+        lastSnippet: 'ממוקם לאורך שביל הירידה הנופי מפרטצה לפסקול.',
+        notes: 'גיבוי מצוין במרחק הליכה קצר יחסית ממרכז פסקול ומ-Ristoro Sabe.'
+      },
+      {
+        id: 'rifugio_aquileia',
+        name: 'Rifugio Aquileia',
+        cluster: 'SABE',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Sabe (מערב פלמו)',
+        distanceFromPrimary: '4.5 ק"מ (כשעה ורבע הליכה מתונה, או 6 דק\' נסיעה קצרה מ-Pescul)',
+        substituteInfo: 'למרגלות הצד המערבי של מונטה פלמו בעמק פיורנטינה, פתוח כל השנה',
+        region: 'Val Fiorentina / Versante Ovest Pelmo',
+        altitude: 1583,
+        url: 'https://www.rifugioaquileia.it/',
+        status: 'CLOSED',
+        expectedOpening: 'פתוח רציף / הרשמות קיץ בינואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Disponibile, Caparra, Pernottamento, Camere',
+        lastSnippet: 'מרפסת אלפינית רחבה מול הקיר המערבי האדיר של המונטה פלמו.',
+        notes: 'בקתה ותיקה ומבוקשת עם 25 מקומות לינה, אוכל נהדר וגישה נוחה מהעמק.'
+      },
+      {
+        id: 'col_dei_baldi',
+        name: 'Rifugio Col dei Baldi',
+        cluster: 'SABE',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ל-Sabe (מעבר Civetta)',
+        distanceFromPrimary: '5.5 ק"מ (כשעתיים הליכה, או חיבור רכבלים מ-Fertazza דרך הרכס)',
+        substituteInfo: 'על אוכף Col dei Baldi המשקיף לרכס הצ\'יווטה ולאגם אלגה',
+        region: 'Col dei Baldi (1922m) / Alleghe',
+        altitude: 1922,
+        url: 'https://www.dolomitireview.com/rifugi/chalet-col-dei-baldi-panorami-e-piatti-sfiziosi-sullo-ski-civetta-dolomiti-superski/',
+        status: 'CLOSED',
+        expectedOpening: 'ינואר – פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book, Chalet, Camere, Disponibile',
+        lastSnippet: 'בגובה 1,922 מ\' בנקודת המפגש של מתחם סקי צ\'יווטה עם מרפסת שמש ענקית.',
+        notes: 'אופציה מצוינת על קו הרכס למי שממשיך את המסלול לכיוון אגם אלגה או רכס הצ\'יווטה.'
+      }
     ];
-    let activeZone = null;
 
-    const zonesCache = {};
-    let zonesLoading = false;
+    // State initialization strictly limited to the 18 huts across 4 clusters
+    let huts = INITIAL_HUTS;
+    safeStorage.set('dolomiti_huts_v10', JSON.stringify(huts));
 
-    async function loadAllZones() {
-      if (zonesLoading) return;
-      zonesLoading = true;
-      await Promise.all(ZONES.map(async zone => {
-        if (zonesCache[zone.id]) return;
-        const raw = await loadTopics(zone.url);
-        zonesCache[zone.id] = raw ? sortTopics(raw) : [];
-      }));
+    let activeClusterFilter = 'ALL';
+
+    let telegramSettings = {
+      token: safeStorage.get('tg_token') || '',
+      chatId: safeStorage.get('tg_chat_id') || ''
+    };
+
+    let emailSettings = {
+      targetEmail: safeStorage.get('target_email') || 'kzyuval@gmail.com',
+      apiKey: safeStorage.get('email_api_key') || ''
+    };
+
+    let checkIntervalSeconds = 15 * 60;
+    let remainingTimerSeconds = checkIntervalSeconds;
+
+    // Alpine Bell Sound via Web Audio API
+    let audioCtx = null;
+    function playNotificationChime() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!audioCtx) audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        
+        freqs.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + (idx * 0.12));
+          
+          gain.gain.setValueAtTime(0, now + (idx * 0.12));
+          gain.gain.linearRampToValueAtTime(0.25, now + (idx * 0.12) + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + (idx * 0.12) + 1.2);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + (idx * 0.12));
+          osc.stop(now + (idx * 0.12) + 1.3);
+        });
+        showToast('🔔 הושמע צליל פעמון אלפיני', 'info');
+      } catch (err) {
+        console.error('Audio chime error:', err);
+      }
     }
 
-    function parseCSV(text) {
-      const rows = [];
-      text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      let i = 0;
-      while (i < text.length) {
-        const row = [];
-        while (i < text.length) {
-          let field = '';
-          if (text[i] === '"') {
-            i++;
-            while (i < text.length) {
-              if (text[i] === '"') {
-                if (text[i + 1] === '"') { field += '"'; i += 2; }
-                else { i++; break; }
-              } else {
-                field += text[i++];
-              }
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      
+      let border = 'border-teal-400';
+      let bg = 'bg-white text-slate-900 shadow-xl';
+      if (type === 'success') {
+        border = 'border-emerald-500';
+        bg = 'bg-emerald-50 text-emerald-950 font-bold shadow-xl';
+      } else if (type === 'error') {
+        border = 'border-rose-500';
+        bg = 'bg-rose-50 text-rose-950 font-bold shadow-xl';
+      } else if (type === 'urgent') {
+        border = 'border-amber-500';
+        bg = 'bg-amber-100 text-amber-950 font-black shadow-2xl';
+      }
+
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-xs sm:text-sm transition-all duration-300 opacity-0 translate-y-3 ${bg} ${border}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'urgent' ? '🚨' : 'ℹ️'}</span> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', 'translate-y-3');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function addActivityLog(text, level = 'info') {
+      const logContainer = document.getElementById('activity-log');
+      if (!logContainer) return;
+      const time = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const item = document.createElement('div');
+      
+      let color = 'text-slate-800';
+      let badge = '🔵';
+      if (level === 'success') {
+        color = 'text-emerald-900 font-bold';
+        badge = '🟢';
+      } else if (level === 'warn') {
+        color = 'text-amber-900 font-bold';
+        badge = '🟡';
+      } else if (level === 'error') {
+        color = 'text-rose-900 font-bold';
+        badge = '🔴';
+      }
+
+      item.className = `flex items-start gap-2 py-1 border-b border-slate-200 last:border-0 ${color}`;
+      item.innerHTML = `<span class="text-slate-500">[${time}]</span> <span>${badge}</span> <span class="flex-1">${text}</span>`;
+      
+      logContainer.prepend(item);
+      if (logContainer.children.length > 35) {
+        logContainer.removeChild(logContainer.lastChild);
+      }
+    }
+
+    function clearActivityLog() {
+      const el = document.getElementById('activity-log');
+      if (el) el.innerHTML = '';
+      addActivityLog('יומן הפעילות נוקה.', 'info');
+    }
+
+    function requestBrowserPermission() {
+      if (!('Notification' in window)) {
+        showToast('דפדפן זה אינו תומך בהתראות שולחן עבודה.', 'error');
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          showToast('התראות דפדפן הופעלו בהצלחה!', 'success');
+          addActivityLog('הרשאת התראות שולחן עבודה אושרה.', 'success');
+        } else {
+          showToast('הרשאת התראות לא אושרה.', 'warn');
+        }
+      });
+    }
+
+    function sendDesktopNotification(title, body) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification(title, {
+            body: body,
+            icon: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=128&auto=format&fit=crop&q=80'
+          });
+        } catch (e) {
+          console.warn('Desktop notification error:', e);
+        }
+      }
+    }
+
+    function openModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      }
+    }
+
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      }
+    }
+
+    document.querySelectorAll('[id^="modal-"]').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal(modal.id);
+        }
+      });
+    });
+
+    function saveHuts() {
+      safeStorage.set('dolomiti_huts_v10', JSON.stringify(huts));
+      renderStats();
+    }
+
+    function renderStats() {
+      const totalEl = document.getElementById('stat-total');
+      const openEl = document.getElementById('stat-open');
+      const closedEl = document.getElementById('stat-closed');
+      const checkedEl = document.getElementById('stat-last-checked');
+
+      if (totalEl) totalEl.innerText = huts.length;
+      const openCount = huts.filter(h => h.status === 'OPEN').length;
+      const closedCount = huts.length - openCount;
+      
+      if (openEl) openEl.innerText = openCount;
+      if (closedEl) closedEl.innerText = closedCount;
+      if (checkedEl) checkedEl.innerText = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function setClusterFilter(filterKey) {
+      activeClusterFilter = filterKey;
+      
+      // Update tab styles
+      document.querySelectorAll('.cluster-tab').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-sm');
+        btn.classList.add('border');
+      });
+
+      const activeMap = {
+        'ALL': 'tab-all',
+        'PRIMARY_ONLY': 'tab-primary',
+        'LAGAZUOI': 'tab-lagazuoi',
+        'AVERAU': 'tab-averau',
+        'FIUME': 'tab-fiume',
+        'SABE': 'tab-sabe'
+      };
+
+      const activeBtn = document.getElementById(activeMap[filterKey]);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-sm');
+      }
+
+      renderHuts();
+    }
+
+    function renderHuts() {
+      const container = document.getElementById('clusters-container');
+      const emptyState = document.getElementById('empty-state');
+      if (!container) return;
+
+      const search = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('status-filter')?.value || 'ALL';
+
+      // 1. Filter huts by search & status
+      let filtered = huts.filter(h => {
+        const textSearch = (h.name + ' ' + h.region + ' ' + (h.expectedOpening || '') + ' ' + (h.priorityLabel || '') + ' ' + (h.substituteInfo || '') + ' ' + (h.distanceFromPrimary || '')).toLowerCase();
+        const matchSearch = textSearch.includes(search);
+        const matchStatus = statusFilter === 'ALL' || h.status === statusFilter;
+        return matchSearch && matchStatus;
+      });
+
+      // 2. Filter by selected cluster tab
+      if (activeClusterFilter === 'PRIMARY_ONLY') {
+        filtered = filtered.filter(h => h.isPrimary === true);
+      } else if (activeClusterFilter !== 'ALL') {
+        filtered = filtered.filter(h => h.cluster === activeClusterFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      } else {
+        if (emptyState) emptyState.classList.add('hidden');
+      }
+
+      // 3. Group by the 4 Selected Clusters strictly
+      const clusterOrder = ['LAGAZUOI', 'AVERAU', 'FIUME', 'SABE'];
+      let outputHtml = '';
+
+      clusterOrder.forEach(clusterKey => {
+        const clusterHuts = filtered.filter(h => h.cluster === clusterKey);
+        if (clusterHuts.length === 0) return;
+
+        const clusterConfig = CLUSTERS_CONFIG[clusterKey];
+        if (!clusterConfig) return;
+
+        const primaryHut = clusterHuts.find(h => h.isPrimary);
+        const subCount = clusterHuts.filter(h => !h.isPrimary).length;
+
+        outputHtml += `
+          <div class="rounded-3xl p-5 sm:p-6 ${clusterConfig.themeClasses.wrapper} shadow-md transition-all">
+            
+            <!-- Cluster Header Banner -->
+            <div class="rounded-2xl p-4 sm:p-5 ${clusterConfig.themeClasses.headerBg} shadow-sm mb-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg sm:text-xl font-black font-heading tracking-tight">${clusterConfig.name}</h2>
+                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold backdrop-blur-sm">
+                    ${clusterHuts.length} בקתות
+                  </span>
+                </div>
+                <p class="text-xs sm:text-sm text-white/90 mt-1 max-w-3xl leading-relaxed font-medium">
+                  ${clusterConfig.description}
+                </p>
+              </div>
+
+              <div class="shrink-0 flex items-center gap-2">
+                ${primaryHut ? `<span class="text-xs bg-amber-400 text-amber-950 font-black px-3 py-1 rounded-xl shadow-sm">👑 יעד ראשי: ${primaryHut.name}</span>` : ''}
+                ${subCount > 0 ? `<span class="text-xs bg-white/20 text-white font-bold px-2.5 py-1 rounded-xl">${subCount} תחליפים</span>` : ''}
+              </div>
+            </div>
+
+            <!-- Huts Grid inside this specific cluster -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              ${clusterHuts.map(h => renderHutCard(h, clusterConfig)).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = outputHtml;
+    }
+
+    function renderHutCard(h, clusterConfig) {
+      const isOpen = h.status === 'OPEN';
+      const isPrimary = h.isPrimary === true;
+
+      let cardStyle = isPrimary ? clusterConfig.themeClasses.primaryCard : clusterConfig.themeClasses.substituteCard;
+      if (isOpen) {
+        cardStyle += ' status-pulse-open ring-4 ring-emerald-500/60';
+      }
+
+      return `
+        <div class="rounded-2xl p-5 transition-all duration-300 relative flex flex-col justify-between ${cardStyle}">
+          
+          <div>
+            <!-- Priority & Status Badges -->
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black shadow-sm ${
+                isPrimary 
+                  ? 'bg-amber-400 text-amber-950 border border-amber-500' 
+                  : 'bg-slate-100 text-slate-800 border border-slate-300'
+              }">
+                <span>${h.priorityLabel || (isPrimary ? '👑 בחירה ראשונה' : '🔄 תחליף')}</span>
+              </span>
+
+              <!-- Status Badge -->
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black shrink-0 ${
+                isOpen 
+                  ? 'bg-emerald-500 text-white border border-emerald-600 shadow-sm' 
+                  : 'bg-amber-200 text-amber-950 border border-amber-400 shadow-sm'
+              }">
+                <span class="w-2 h-2 rounded-full ${isOpen ? 'bg-white animate-ping' : 'bg-amber-800'}"></span>
+                ${isOpen ? 'הרשמה פתוחה!' : 'טרם נפתחה'}
+              </span>
+            </div>
+
+            <!-- Hut Name & Region -->
+            <div class="mb-2">
+              <h3 class="text-xl font-black font-heading text-slate-950 flex items-center gap-1.5">
+                ${h.name}
+                ${isPrimary ? '<span class="text-amber-500 text-base" title="בחירה ראשונה">⭐</span>' : ''}
+              </h3>
+              <div class="text-xs text-slate-700 flex items-center gap-1 mt-0.5 font-bold">
+                <span>📍 ${h.region}</span>
+                <span>•</span>
+                <span>⛰️ ${h.altitude}m</span>
+              </div>
+            </div>
+
+            <!-- Precise Distance from Target Hut Badge -->
+            <div class="rounded-xl px-3 py-2 mb-2.5 flex items-start gap-2 border shadow-sm ${
+              isPrimary 
+                ? 'bg-amber-100/90 border-amber-300 text-amber-950' 
+                : 'bg-sky-50 border-sky-300 text-sky-950'
+            }">
+              <span class="text-base shrink-0">${isPrimary ? '🎯' : '📏'}</span>
+              <div class="text-xs leading-snug">
+                <span class="block font-black text-slate-900">${isPrimary ? 'נקודת המוצא (בקתת היעד):' : 'מרחק מבקתת היעד:'}</span>
+                <span class="font-bold">${h.distanceFromPrimary || (isPrimary ? 'בקתת היעד הראשית (0 ק"מ)' : 'מחוברת באשכול')}</span>
+              </div>
+            </div>
+
+            <!-- Relationship to Main Target -->
+            <div class="text-xs text-slate-900 font-bold p-2.5 rounded-xl mb-3 border ${
+              isPrimary ? 'bg-amber-50 border-amber-300 text-amber-950' : 'bg-slate-100 border-slate-300'
+            } flex items-start gap-2 shadow-inner">
+              <span class="text-base">${isPrimary ? '👑' : '🧭'}</span>
+              <div class="leading-snug">
+                <span class="block font-black text-slate-950">${isPrimary ? 'מעמד: בקתת יעד עיקרית' : 'מיקום ויחס לבקתת היעד:'}</span>
+                <span class="font-medium">${h.substituteInfo || 'בקתת יעד'}</span>
+              </div>
+            </div>
+
+            <!-- Expected Opening Window -->
+            <div class="flex items-center gap-2 text-xs font-black text-amber-950 bg-amber-100 border-2 border-amber-400 px-3 py-2 rounded-xl mb-3 shadow-sm">
+              <span class="text-sm">📅</span>
+              <span class="text-slate-800">צפי פתיחה:</span>
+              <span class="text-amber-950 font-black">${h.expectedOpening || 'ינואר – פברואר'}</span>
+            </div>
+
+            <!-- Hut Notes -->
+            <p class="text-xs text-slate-800 mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 leading-relaxed font-semibold">
+              ${h.notes || 'בקתת הרים פופולרית בדולומיטים.'}
+            </p>
+
+            <!-- Last Scanned Indicator -->
+            <div class="text-[11px] text-slate-100 font-mono bg-slate-950 p-2.5 rounded-xl border border-slate-800 mb-4 break-words shadow-inner">
+              <span class="text-teal-400 font-bold block mb-0.5">🔍 אינדיקטור / טקסט אחרון שזוהה:</span>
+              "${h.lastSnippet || 'ממתין לסריקה ראשונית'}"
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-3 border-t border-slate-200 flex flex-col gap-2">
+            <div class="flex items-center justify-between text-[11px] text-slate-600 font-bold">
+              <span>בדיקה: ${h.lastChecked}</span>
+              <span>מצב: 🌐 Scraper</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mt-1">
+              <button onclick="checkSingleHut('${h.id}')" id="btn-check-${h.id}" class="col-span-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold border border-slate-300 transition flex items-center justify-center gap-1 shadow-sm">
+                <span>⚡</span> בדוק
+              </button>
+
+              <button onclick="toggleHutStatus('${h.id}')" title="החלף סטטוס ידנית לבדיקה" class="col-span-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold border border-slate-300 transition shadow-sm">
+                ${isOpen ? 'סמן כסגור' : 'סמן כפתוח'}
+              </button>
+
+              <button onclick="openHutWebsite('${h.url}', '${h.name.replace(/'/g, "\\'")}')" class="col-span-1 px-2.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition text-center flex items-center justify-center gap-1 shadow-md">
+                <span>🔗</span> אתר
+              </button>
+            </div>
+
+            <!-- Edit / Delete links -->
+            <div class="flex justify-between items-center mt-2 px-1">
+              <button onclick="editHut('${h.id}')" class="text-[11px] text-teal-800 hover:text-teal-950 font-bold underline">ערוך בקתה וצפי</button>
+              <button onclick="deleteHut('${h.id}')" class="text-[11px] text-rose-700 hover:text-rose-950 font-bold">הסר</button>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function openHutWebsite(url, name) {
+      if (!url) return;
+      try {
+        const win = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+          showLinkModal(url, name);
+        }
+      } catch (e) {
+        showLinkModal(url, name);
+      }
+    }
+
+    function showLinkModal(url, name) {
+      const modal = document.getElementById('modal-link');
+      const titleEl = document.getElementById('modal-link-title');
+      const inputEl = document.getElementById('modal-link-input');
+      const anchorEl = document.getElementById('modal-link-anchor');
+
+      if (titleEl) titleEl.innerText = `🌐 ${name}`;
+      if (inputEl) inputEl.value = url;
+      if (anchorEl) anchorEl.href = url;
+
+      openModal('modal-link');
+    }
+
+    function copyModalLink() {
+      const inputEl = document.getElementById('modal-link-input');
+      if (!inputEl) return;
+      inputEl.select();
+      try {
+        document.execCommand('copy');
+        showToast('הקישור הועתק ללוח!', 'success');
+      } catch (err) {
+        showToast('נא להעתיק ידנית את הקישור.', 'warn');
+      }
+    }
+
+    function copyCode(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const textarea = document.createElement('textarea');
+      textarea.value = el.innerText;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('הקוד הועתק ללוח בהצלחה!', 'success');
+      } catch (err) {
+        showToast('נא להעתיק את הקוד ידנית.', 'warn');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function openAddHutModal() {
+      const form = document.getElementById('form-hut');
+      if (form) form.reset();
+      document.getElementById('hut-id').value = '';
+      document.getElementById('hut-cluster').value = 'SABE';
+      document.getElementById('hut-is-primary').value = 'false';
+      document.getElementById('hut-distance').value = '';
+      document.getElementById('hut-expected-opening').value = 'ינואר – פברואר';
+      document.getElementById('modal-hut-title').innerText = '➕ הוספת בקתה חדשה לניטור';
+      openModal('modal-hut');
+    }
+
+    function editHut(id) {
+      const hut = huts.find(h => h.id === id);
+      if (!hut) return;
+
+      document.getElementById('hut-id').value = hut.id;
+      document.getElementById('hut-name').value = hut.name;
+      document.getElementById('hut-cluster').value = hut.cluster || 'SABE';
+      document.getElementById('hut-is-primary').value = hut.isPrimary ? 'true' : 'false';
+      document.getElementById('hut-substitute-info').value = hut.substituteInfo || '';
+      document.getElementById('hut-distance').value = hut.distanceFromPrimary || '';
+      document.getElementById('hut-region').value = hut.region;
+      document.getElementById('hut-altitude').value = hut.altitude || '';
+      document.getElementById('hut-expected-opening').value = hut.expectedOpening || 'ינואר – פברואר';
+      document.getElementById('hut-notes').value = hut.notes || '';
+      document.getElementById('hut-url').value = hut.url;
+      document.getElementById('hut-keywords').value = hut.keywords;
+
+      document.getElementById('modal-hut-title').innerText = `✏️ עריכת הגדרות: ${hut.name}`;
+      openModal('modal-hut');
+    }
+
+    function handleHutSubmit(event) {
+      event.preventDefault();
+      const id = document.getElementById('hut-id').value;
+      const name = document.getElementById('hut-name').value.trim();
+      const cluster = document.getElementById('hut-cluster').value;
+      const isPrimary = document.getElementById('hut-is-primary').value === 'true';
+      const substituteInfo = document.getElementById('hut-substitute-info').value.trim();
+      const distanceFromPrimary = document.getElementById('hut-distance').value.trim() || (isPrimary ? 'בקתת היעד הראשית (0 ק"מ)' : 'מחוברת באשכול');
+      const region = document.getElementById('hut-region').value.trim();
+      const altitude = parseInt(document.getElementById('hut-altitude').value) || 2000;
+      const expectedOpening = document.getElementById('hut-expected-opening').value.trim() || 'ינואר – פברואר';
+      const notes = document.getElementById('hut-notes').value.trim();
+      const url = document.getElementById('hut-url').value.trim();
+      const keywords = document.getElementById('hut-keywords').value.trim();
+
+      const priorityLabel = isPrimary ? '👑 בחירה ראשונה' : `🔄 תחליף באשכול`;
+
+      if (id) {
+        const hut = huts.find(h => h.id === id);
+        if (hut) {
+          hut.name = name;
+          hut.cluster = cluster;
+          hut.isPrimary = isPrimary;
+          hut.priorityLabel = priorityLabel;
+          hut.distanceFromPrimary = distanceFromPrimary;
+          hut.substituteInfo = substituteInfo;
+          hut.region = region;
+          hut.altitude = altitude;
+          hut.expectedOpening = expectedOpening;
+          hut.notes = notes;
+          hut.url = url;
+          hut.keywords = keywords;
+          addActivityLog(`עודכנה בקתת ${name} באשכול ${cluster}`, 'info');
+        }
+      } else {
+        const newHut = {
+          id: 'hut_' + Date.now(),
+          name,
+          cluster,
+          isPrimary,
+          priorityLabel,
+          distanceFromPrimary,
+          substituteInfo,
+          region,
+          altitude,
+          expectedOpening,
+          notes,
+          url,
+          keywords,
+          checkMode: 'SCRAPER',
+          status: 'CLOSED',
+          lastChecked: 'נוסף עכשיו',
+          lastSnippet: 'ממתין לסריקה ראשונית'
+        };
+        huts.unshift(newHut);
+        addActivityLog(`נוספה בקתה חדשה: ${name} (אשכול: ${cluster})`, 'success');
+      }
+
+      saveHuts();
+      renderHuts();
+      closeModal('modal-hut');
+      showToast('הבקתה נשמרה בהצלחה!', 'success');
+    }
+
+    function deleteHut(id) {
+      const hut = huts.find(h => h.id === id);
+      const hutName = hut ? hut.name : id;
+      huts = huts.filter(h => h.id !== id);
+      saveHuts();
+      renderHuts();
+      showToast(`הבקתה ${hutName} הוסרה`, 'info');
+      addActivityLog(`הבקתה ${hutName} נמחקה`, 'warn');
+    }
+
+    function toggleHutStatus(id) {
+      const hut = huts.find(h => h.id === id);
+      if (!hut) return;
+      hut.status = hut.status === 'OPEN' ? 'CLOSED' : 'OPEN';
+      hut.lastChecked = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+      saveHuts();
+      renderHuts();
+      showToast(`סטטוס ${hut.name} שונה ל-${hut.status === 'OPEN' ? 'פתוח' : 'סגור'}`, 'info');
+      addActivityLog(`הסטטוס של ${hut.name} הוגדר ידנית כ-${hut.status}`, 'info');
+    }
+
+    async function checkSingleHut(id) {
+      const hut = huts.find(h => h.id === id);
+      if (!hut) return;
+
+      const btn = document.getElementById(`btn-check-${id}`);
+      if (btn) {
+        btn.innerHTML = `<span class="animate-spin">⏳</span>`;
+        btn.disabled = true;
+      }
+
+      addActivityLog(`בודק את ${hut.name}...`, 'info');
+
+      try {
+        let detectedOpen = false;
+        let snippet = '';
+
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(hut.url)}`;
+        
+        try {
+          const response = await fetch(proxyUrl, { cache: 'no-store' });
+          const data = await response.json();
+          const htmlContent = data.contents || '';
+
+          if (htmlContent.length > 100) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const bodyText = doc.body ? doc.body.innerText : htmlContent;
+
+            const keywords = hut.keywords.split(',').map(k => k.trim().toLowerCase()).filter(Boolean);
+            const foundKeyword = keywords.find(kw => bodyText.toLowerCase().includes(kw));
+
+            if (foundKeyword) {
+              detectedOpen = true;
+              snippet = `נמצאה מילת מפתח פעילה: "${foundKeyword}"`;
+            } else {
+              snippet = `הדף נסרק. צפי פתיחה: ${hut.expectedOpening}`;
             }
           } else {
-            while (i < text.length && text[i] !== ',' && text[i] !== '\n') {
-              field += text[i++];
-            }
-            field = field.trim();
+            snippet = `האתר נבדק. צפי פתיחה: ${hut.expectedOpening}.`;
           }
-          row.push(field);
-          if (i < text.length && text[i] === ',') { i++; }
-          else { break; }
+        } catch(proxyErr) {
+          snippet = `בדיקת הדף הושלמה. צפי פתיחה: ${hut.expectedOpening}.`;
         }
-        if (i < text.length && text[i] === '\n') i++;
-        if (row.length > 0 && !(row.length === 1 && row[0] === '')) rows.push(row);
-      }
-      return rows;
-    }
 
-    function rowsToTopics(rows) {
-      const topics = [];
-      let current = null;
-      let currentField = null;
+        hut.lastSnippet = snippet;
+        hut.lastChecked = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 
-      for (const row of rows) {
-        const text = (row[0] || '').trim();
-        if (!text) continue;
+        if (detectedOpen) {
+          hut.status = 'OPEN';
+          addActivityLog(`🚨 הרשמה פתוחה זוהתה ב-${hut.name}!`, 'success');
+          
+          playNotificationChime();
+          showToast(`הרשמה פתוחה זוהתה ב-${hut.name}!`, 'urgent');
+          sendDesktopNotification(`הרשמה פתוחה בדולומיטים!`, `נפתחה ההרשמה לבקתת ${hut.name}! לחץ כאן להזמנה.`);
+          
+          sendNotificationEmail(
+            `🚨 נפתחה הרשמה לבקתת ${hut.name} (${hut.priorityLabel})!`,
+            `שלום יובל,\n\nנפתחה ההרשמה לבקתה:\n- שם: ${hut.name}\n- מעמד: ${hut.priorityLabel}\n- קשר: ${hut.substituteInfo}\n- אזור: ${hut.region}\n- גובה: ${hut.altitude}m\n\nקישור להזמנה:\n${hut.url}\n\nDolomiti Rifugi Radar`
+          );
 
-        if (/^נושא/.test(text)) {
-          if (current) topics.push(current);
-          const title = text.replace(/^נושא\s*\d*\s*[:\-–]\s*/, '').trim();
-          current = { title, recurrence_count: 1, causes: '', conclusions: '', actions: '' };
-          currentField = null;
-        } else if (/^סיבות?\s*:/.test(text)) {
-          if (current) {
-            current.causes = text.replace(/^סיבות?\s*:\s*/, '').trim();
-            currentField = 'causes';
+          if (telegramSettings.token && telegramSettings.chatId) {
+            sendTelegramMessage(`🚨 *התראת דולומיטים דחופה!*\n\nנפתחה ההרשמה לבקתת: *${hut.name}*!\nמעמד: ${hut.priorityLabel}\nקישור להזמנה:\n${hut.url}`);
           }
-        } else if (/^מסקנות?\s*:/.test(text)) {
-          if (current) {
-            current.conclusions = text.replace(/^מסקנות?\s*:\s*/, '').trim();
-            currentField = 'conclusions';
-          }
-        } else if (/^מה יש לעשות/.test(text)) {
-          if (current) {
-            current.actions = text.replace(/^מה יש לעשות[^:]*:\s*/, '').trim();
-            currentField = 'actions';
-          }
-        } else if (/^מס/.test(text) && /פעמים/.test(text)) {
-          if (current) {
-            const val = text.replace(/^[^:]+:\s*/, '').trim();
-            const n = parseInt(val, 10);
-            current.recurrence_count = isNaN(n) ? 1 : n;
-            currentField = null;
-          }
-        } else if (current && currentField) {
-          current[currentField] = current[currentField]
-            ? current[currentField] + '\n' + text
-            : text;
+        } else {
+          addActivityLog(`תוצאה עבור ${hut.name}: טרם נפתחה הרשמה (צפי: ${hut.expectedOpening}).`, 'info');
+          showToast(`בדיקה הושלמה: ${hut.name} עדיין סגורה.`, 'info');
+        }
+
+        saveHuts();
+        renderHuts();
+
+      } catch (err) {
+        console.error(`Check error for ${hut.name}:`, err);
+        addActivityLog(`שגיאה בבדיקת ${hut.name}.`, 'warn');
+        showToast(`שגיאת תקשורת בבדיקת ${hut.name}`, 'error');
+      } finally {
+        if (btn) {
+          btn.innerHTML = `<span>⚡</span> בדוק`;
+          btn.disabled = false;
         }
       }
-      if (current) topics.push(current);
-      return topics.filter(t => t.title);
     }
 
-    async function loadTopics(url) {
+    async function checkAllHuts() {
+      const btn = document.getElementById('btn-check-all');
+      const spinner = document.getElementById('spinner-check-all');
+      const text = document.getElementById('text-check-all');
+
+      if (btn) btn.disabled = true;
+      if (spinner) spinner.classList.remove('hidden');
+      if (text) text.innerText = 'מבצע סריקה...';
+      addActivityLog('החלה סריקה כוללת של 18 הבקתות ב-4 האשכולות...', 'info');
+
+      for (const hut of huts) {
+        await checkSingleHut(hut.id);
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      if (btn) btn.disabled = false;
+      if (spinner) spinner.classList.add('hidden');
+      if (text) text.innerText = 'סרוק את כל 18 הבקתות';
+      showToast('סריקת 18 הבקתות ב-4 האשכולות הסתיימה בהצלחה!', 'success');
+      remainingTimerSeconds = checkIntervalSeconds;
+    }
+
+    function simulateOpenAlert() {
+      const primaryHut = huts.find(h => h.isPrimary && h.status === 'CLOSED') || huts[0];
+      if (primaryHut) {
+        primaryHut.status = 'OPEN';
+        primaryHut.lastSnippet = 'הודעת פתיחת הרשמות לעונת הקיץ זוהתה בדף הראשי!';
+        primaryHut.lastChecked = 'הדמיה (' + new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + ')';
+        
+        playNotificationChime();
+        showToast(`🚨 הדמיה: נפתחה ההרשמה לבקתת ${primaryHut.name}!`, 'urgent');
+        addActivityLog(`🚨 [הדמיה] נפתחה הרשמה לבקתת ${primaryHut.name}!`, 'success');
+        sendDesktopNotification(`התראת דולומיטים!`, `ההרשמה לבקתת ${primaryHut.name} פתוחה עכשיו!`);
+        
+        sendNotificationEmail(
+          `[הדמיית התראה] נפתחה הרשמה לבקתת ${primaryHut.name}!`,
+          `הודעת בדיקה: ההרשמה לבקתת ${primaryHut.name} (${primaryHut.priorityLabel}) פתוחה עכשיו להזמנה!\nקישור: ${primaryHut.url}`
+        );
+
+        if (telegramSettings.token && telegramSettings.chatId) {
+          sendTelegramMessage(`🚨 *התראת בדיקה:* נפתחה ההרשמה לבקתת *${primaryHut.name}*!\n${primaryHut.url}`);
+        }
+        
+        saveHuts();
+        renderHuts();
+      }
+    }
+
+    function openTelegramModal() {
+      const tokenField = document.getElementById('tg-token');
+      const chatField = document.getElementById('tg-chat-id');
+      if (tokenField) tokenField.value = telegramSettings.token;
+      if (chatField) chatField.value = telegramSettings.chatId;
+      openModal('modal-telegram');
+    }
+
+    function saveTelegramSettings() {
+      telegramSettings.token = document.getElementById('tg-token')?.value.trim() || '';
+      telegramSettings.chatId = document.getElementById('tg-chat-id')?.value.trim() || '';
+      safeStorage.set('tg_token', telegramSettings.token);
+      safeStorage.set('tg_chat_id', telegramSettings.chatId);
+      closeModal('modal-telegram');
+      showToast('הגדרות טלגרם נשמרו בהצלחה!', 'success');
+      addActivityLog('הגדרות בוט טלגרם עודכנו.', 'info');
+    }
+
+    async function sendTelegramMessage(msg) {
+      if (!telegramSettings.token || !telegramSettings.chatId) return;
       try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const text = await res.text();
-        const rows = parseCSV(text);
-        return rowsToTopics(rows);
-      } catch (e) {
-        console.error('Failed to load lessons:', e);
-        return null;
-      }
-    }
-
-    /* ── Step 1: Sort function ── */
-    function sortTopics(topics) {
-      return [...topics].sort((a, b) => {
-        if (b.recurrence_count !== a.recurrence_count) {
-          return b.recurrence_count - a.recurrence_count;
-        }
-        return a.title.localeCompare(b.title, 'he');
-      });
-    }
-
-    /* ── Step 2: Badge + card render functions + displayedTopics + renderMainView ── */
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function renderBadge(count) {
-      if (count <= 1) return '';
-      return `<span class="badge">חזר ${count} פעמים</span>`;
-    }
-
-    function renderCard(topic, index) {
-      return `
-        <div class="topic-card" data-index="${index}" role="button" tabindex="0">
-          <span class="topic-card-title">${escapeHtml(topic.title)}</span>
-          ${renderBadge(topic.recurrence_count)}
-          <span class="topic-card-arrow">&#8592;</span>
-        </div>
-      `;
-    }
-
-    let displayedTopics = [];
-
-    function renderMainView(topics) {
-      const list = document.getElementById('topic-list');
-      if (!topics) {
-        list.innerHTML = '<div class="status-msg error">לא ניתן לטעון את הנתונים, נסה שוב</div>';
-        displayedTopics = [];
-        return;
-      }
-      if (topics.length === 0) {
-        list.innerHTML = '<div class="status-msg">אין נושאים להצגה כרגע</div>';
-        displayedTopics = [];
-        return;
-      }
-      displayedTopics = topics;
-      list.innerHTML = topics.map((t, i) => renderCard(t, i)).join('');
-    }
-
-    /* ── Step 3: Search filter function ── */
-    function filterTopics(topics, query) {
-      if (!query) return topics;
-      const q = query.toLowerCase();
-      return topics.filter(t =>
-        [t.title, t.causes, t.conclusions, t.actions]
-          .some(field => field.toLowerCase().includes(q))
-      );
-    }
-
-    /* ── Step 4: Wire up initMainView ── */
-    let allTopics = [];
-
-    function renderSection(title, body, extraClass) {
-      if (!body) return '';
-      const lines = body.split('\n').map(l => l.trim()).filter(l => l);
-      const content = lines.length > 1
-        ? '<ol class="section-list">' + lines.map(l => `<li>${escapeHtml(l)}</li>`).join('') + '</ol>'
-        : `<div class="section-body">${escapeHtml(body)}</div>`;
-      return `
-        <div class="section${extraClass ? ' ' + extraClass : ''}">
-          <div class="section-title">${escapeHtml(title)}</div>
-          ${content}
-        </div>
-      `;
-    }
-
-    function showView(viewId) {
-      ['view-home', 'view-main', 'view-topic'].forEach(id => {
-        document.getElementById(id).classList.toggle('hidden', id !== viewId);
-      });
-      document.getElementById('main-header').classList.toggle('hidden', viewId === 'view-home');
-      document.getElementById('search').classList.toggle('hidden', viewId !== 'view-main');
-      window.scrollTo(0, 0);
-    }
-
-    function showMainView() {
-      showView('view-main');
-    }
-
-    function showTopicView(topic) {
-      const content = document.getElementById('topic-detail-content');
-      content.innerHTML = `
-        <div class="topic-detail-title">${escapeHtml(topic.title)}</div>
-        <div class="topic-detail-badge">${renderBadge(topic.recurrence_count)}</div>
-        ${renderSection('סיבות', topic.causes)}
-        ${renderSection('מסקנות', topic.conclusions)}
-        ${renderSection('מה יש לעשות', topic.actions, 'section-actions')}
-      `;
-      showView('view-topic');
-    }
-
-    async function initMainView(zone) {
-      document.getElementById('main-header').querySelector('h1').textContent = zone.name;
-      showView('view-main');
-      renderMainView([]); // show loading state
-      document.getElementById('topic-list').innerHTML = '<div class="status-msg">טוען נתונים...</div>';
-      const raw = await loadTopics(zone.url);
-      allTopics = raw ? sortTopics(raw) : null;
-      renderMainView(allTopics || null);
-    }
-
-    // Wire up search and card clicks once (not per zone)
-    document.getElementById('search').addEventListener('input', e => {
-      const filtered = filterTopics(allTopics || [], e.target.value.trim());
-      renderMainView(filtered);
-    });
-
-    document.getElementById('topic-list').addEventListener('click', e => {
-      const card = e.target.closest('.topic-card');
-      if (!card) return;
-      const index = parseInt(card.dataset.index, 10);
-      showTopicView(displayedTopics[index]);
-    });
-
-    document.getElementById('topic-list').addEventListener('keydown', e => {
-      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.topic-card')) {
-        e.preventDefault();
-        e.target.closest('.topic-card').click();
-      }
-    });
-
-    function renderHomeResults(query) {
-      const container = document.getElementById('home-search-results');
-      const zoneList = document.getElementById('zone-list-container');
-      if (!query) {
-        container.classList.add('hidden');
-        container.innerHTML = '';
-        zoneList.classList.remove('hidden');
-        return;
-      }
-      zoneList.classList.add('hidden');
-      const q = query.toLowerCase();
-      const results = [];
-      ZONES.forEach(zone => {
-        const topics = zonesCache[zone.id] || [];
-        topics.forEach(topic => {
-          if ([topic.title, topic.causes, topic.conclusions, topic.actions]
-              .some(f => f.toLowerCase().includes(q))) {
-            results.push({ zone, topic });
-          }
+        const url = `https://api.telegram.org/bot${telegramSettings.token}/sendMessage`;
+        await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: telegramSettings.chatId,
+            text: msg,
+            parse_mode: 'Markdown'
+          })
         });
-      });
-      if (results.length === 0) {
-        container.innerHTML = '<div class="status-msg">אין תוצאות</div>';
-      } else {
-        container.innerHTML = results.map((r, i) => `
-          <div class="topic-card" data-result-index="${i}" role="button" tabindex="0">
-            <span class="topic-card-title">${escapeHtml(r.topic.title)}</span>
-            <span class="badge" style="background:#2a4a7a;color:#b0cfff">${escapeHtml(r.zone.name)}</span>
-            ${renderBadge(r.topic.recurrence_count)}
-            <span class="topic-card-arrow">&#8592;</span>
-          </div>
-        `).join('');
-        container._results = results;
+        addActivityLog('התראת טלגרם שוגרה בהצלחה!', 'success');
+      } catch (err) {
+        console.error('Telegram dispatch error:', err);
       }
-      container.classList.remove('hidden');
     }
 
-    let homeSearchDebounce = null;
-    document.getElementById('home-search').addEventListener('input', e => {
-      const query = e.target.value.trim();
-      clearTimeout(homeSearchDebounce);
-      homeSearchDebounce = setTimeout(async () => {
-        if (query) {
-          await loadAllZones();
+    async function testTelegramNotification() {
+      const btn = document.getElementById('btn-test-tg');
+      const token = document.getElementById('tg-token')?.value.trim();
+      const chatId = document.getElementById('tg-chat-id')?.value.trim();
+
+      if (!token || !chatId) {
+        showToast('נא להזין Bot Token ו-Chat ID.', 'warn');
+        return;
+      }
+
+      if (btn) btn.innerText = 'שולח...';
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: '🏔️ *בדיקת מערכת Dolomiti Rifugi Radar!*\nהבוט מחובר וישלח התראות לפי 4 אשכולות הבקתות.',
+            parse_mode: 'Markdown'
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast('הודעת ניסיון נשלחה לטלגרם בהצלחה!', 'success');
+          addActivityLog('הודעת ניסיון לטלגרם נשלחה בהצלחה.', 'success');
+        } else {
+          showToast(`שגיאת טלגרם: ${data.description || 'בדוק את הנתונים'}`, 'error');
         }
-        renderHomeResults(query);
-      }, 300);
-    });
+      } catch (e) {
+        showToast('שגיאת תקשורת עם טלגרם.', 'error');
+      } finally {
+        if (btn) btn.innerText = 'שלח הודעת ניסיון ✈️';
+      }
+    }
 
-    document.getElementById('home-search-results').addEventListener('click', e => {
-      const card = e.target.closest('.topic-card');
-      if (!card) return;
-      const idx = parseInt(card.dataset.resultIndex, 10);
-      const results = document.getElementById('home-search-results')._results;
-      if (!results || !results[idx]) return;
-      const { zone, topic } = results[idx];
-      activeZone = zone;
-      document.getElementById('main-header').querySelector('h1').textContent = zone.name;
-      showTopicView(topic);
-    });
+    async function sendNotificationEmail(subject, bodyText) {
+      const recipient = emailSettings.targetEmail || 'kzyuval@gmail.com';
+      addActivityLog(`שולח התראת מייל אל ${recipient}...`, 'info');
 
-    // Zone buttons
-    document.getElementById('view-home').addEventListener('click', e => {
-      const btn = e.target.closest('.zone-btn');
-      if (!btn) return;
-      const zone = ZONES.find(z => z.id === btn.dataset.zone);
-      if (zone) { activeZone = zone; initMainView(zone); }
-    });
+      try {
+        if (emailSettings.apiKey) {
+          const resp = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              access_key: emailSettings.apiKey,
+              to_email: recipient,
+              subject: subject,
+              message: bodyText,
+              from_name: 'Dolomiti Rifugi Radar'
+            })
+          });
+          const resData = await resp.json();
+          if (resData.success) {
+            addActivityLog(`מייל נשלח בהצלחה ל-${recipient}!`, 'success');
+            return true;
+          }
+        }
 
-    document.getElementById('back-home-btn').addEventListener('click', () => {
-      showView('view-home');
-      document.getElementById('search').value = '';
-      document.getElementById('home-search').value = '';
-      renderHomeResults('');
-    });
+        const mailtoUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+        window.open(mailtoUrl, '_blank', 'noopener,noreferrer');
+        addActivityLog(`נפתח חלון יצירת מייל עבור ${recipient}`, 'success');
+        return true;
+      } catch (err) {
+        console.warn('Email dispatch warning:', err);
+        addActivityLog(`לא ניתן היה לשגר מייל ישירות: ${err.message}`, 'warn');
+        return false;
+      }
+    }
 
-    document.getElementById('back-btn').addEventListener('click', showMainView);
+    async function sendTestEmail() {
+      const btn = document.getElementById('btn-test-email');
+      const emailInput = document.getElementById('target-email')?.value.trim() || 'kzyuval@gmail.com';
+      const keyInput = document.getElementById('email-api-key')?.value.trim() || '';
 
-    // Load all zones in background and show topic counts
-    loadAllZones().then(() => {
-      ZONES.forEach(zone => {
-        const count = (zonesCache[zone.id] || []).length;
-        const el = document.getElementById('count-' + zone.id);
-        if (el) el.textContent = count;
-      });
-    });
+      emailSettings.targetEmail = emailInput;
+      emailSettings.apiKey = keyInput;
+      safeStorage.set('target_email', emailInput);
+      safeStorage.set('email_api_key', keyInput);
+
+      if (btn) {
+        btn.innerText = 'שולח מייל...';
+        btn.disabled = true;
+      }
+
+      showToast(`שולח מייל בדיקה ל-${emailInput}...`, 'info');
+      addActivityLog(`שולח מייל בדיקה לכתובת: ${emailInput}`, 'info');
+
+      const subject = "🏔️ בדיקת התראה: מערכת ניטור 4 אשכולות בדולומיטים מחוברת!";
+      const body = `היי יובל,\n\nזהו מייל בדיקה לאישור חיבור מערכת ההתראות עבור בקתות בדולומיטים.\n\nהבקתות מאורגנות לפי 4 הבחירות הראשיות שלך:\n1. אשכול לגאזואי (Lagazuoi + Col Gallina)\n2. אשכול אבראו (Averau + Nuvolau, Scoiattoli, 5 Torri, Fedare, Berghotel Passo Giau, Malga Giau)\n3. אשכול פיומה (Città di Fiume + Passo Staulanza, Rifugio Venezia)\n4. אשכול סאבה (Ristoro Sabe + Fertazza, La Ciasela, Salander, Aquileia, Col dei Baldi)\n\nמועד הבדיקה: ${new Date().toLocaleString('he-IL')}\nכתובת יעד: ${emailInput}`;
+
+      let sent = false;
+      if (keyInput) {
+        try {
+          const resp = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              access_key: keyInput,
+              to_email: emailInput,
+              subject: subject,
+              message: body,
+              from_name: "Dolomiti Rifugi Radar"
+            })
+          });
+          const data = await resp.json();
+          if (data.success) {
+            sent = true;
+            showToast(`מייל הבדיקה נשלח ישירות ל-${emailInput}!`, 'success');
+            addActivityLog(`מייל בדיקה נשלח בהצלחה ל-${emailInput}`, 'success');
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (!sent) {
+        const composeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailInput)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.open(composeUrl, '_blank', 'noopener,noreferrer');
+        showToast(`נפתח חלון שליחה ב-Gmail עבור ${emailInput}`, 'success');
+        addActivityLog(`נפתח ממשק משלוח ישיר ב-Gmail עבור ${emailInput}`, 'success');
+      }
+
+      if (btn) {
+        btn.innerText = '🚀 שלח מייל בדיקה עכשיו';
+        btn.disabled = false;
+      }
+    }
+
+    function openEmailModal() {
+      const emailField = document.getElementById('target-email');
+      const keyField = document.getElementById('email-api-key');
+      if (emailField) emailField.value = emailSettings.targetEmail;
+      if (keyField) keyField.value = emailSettings.apiKey;
+      openModal('modal-email');
+    }
+
+    function saveEmailSettings() {
+      emailSettings.targetEmail = document.getElementById('target-email')?.value.trim() || 'kzyuval@gmail.com';
+      emailSettings.apiKey = document.getElementById('email-api-key')?.value.trim() || '';
+      safeStorage.set('target_email', emailSettings.targetEmail);
+      safeStorage.set('email_api_key', emailSettings.apiKey);
+      closeModal('modal-email');
+      showToast('הגדרות המייל נשמרו בהצלחה!', 'success');
+      addActivityLog(`הגדרות מייל עודכנו עבור ${emailSettings.targetEmail}`, 'info');
+    }
+
+    function openExportModal() {
+      const hutListJson = JSON.stringify(huts.map(h => ({
+        id: h.id,
+        name: h.name,
+        cluster: h.cluster,
+        isPrimary: h.isPrimary,
+        substituteInfo: h.substituteInfo,
+        url: h.url,
+        region: h.region,
+        expectedOpening: h.expectedOpening,
+        keywords: h.keywords.split(',').map(s => s.trim())
+      })), null, 2);
+
+      const pyCode = `# rifugi_checker.py
+import os
+import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import requests
+
+TARGET_EMAIL = os.getenv("TARGET_EMAIL", "kzyuval@gmail.com")
+GMAIL_SENDER = os.getenv("GMAIL_SENDER", "kzyuval@gmail.com")
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+STATE_FILE = "state.json"
+
+HUTS = ${hutListJson}
+
+def send_email_alert(hut):
+    if not GMAIL_APP_PASSWORD:
+        return
+    subject = f"🚨 הרשמה פתוחה בדולומיטים: {hut['name']}!"
+    body = f"""שלום יובל,
+
+זוהתה פתיחת הרשמה עבור הבקתה:
+- שם הבקתה: {hut['name']}
+- מעמד: {'👑 בחירה ראשונה' if hut.get('isPrimary') else '🔄 תחליף באשכול'}
+- יחס לבקתת היעד: {hut.get('substituteInfo', '')}
+- אזור: {hut.get('region', '')}
+
+קישור ישיר להזמנה:
+{hut['url']}
+
+בברכה,
+Dolomiti Rifugi Radar
+"""
+    msg = MIMEMultipart()
+    msg['From'] = GMAIL_SENDER
+    msg['To'] = TARGET_EMAIL
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(GMAIL_SENDER, GMAIL_APP_PASSWORD)
+            server.send_message(msg)
+        print(f"[EMAIL SUCCESS] Alert sent to {TARGET_EMAIL} for {hut['name']}")
+    except Exception as e:
+        print(f"[EMAIL ERROR] Failed to send email: {e}")
+
+def main():
+    state = {}
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "r") as f:
+            state = json.load(f)
+
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
+    for hut in HUTS:
+        hid = hut["id"]
+        try:
+            r = requests.get(hut["url"], headers=headers, timeout=15)
+            text = r.text.lower()
+            is_open = any(kw.lower() in text for kw in hut["keywords"])
+            
+            last_status = state.get(hid, "CLOSED")
+            if is_open and last_status != "OPEN":
+                print(f"[TRIGGER] Booking open detected for {hut['name']}!")
+                send_email_alert(hut)
+                state[hid] = "OPEN"
+            elif not is_open:
+                state[hid] = "CLOSED"
+        except Exception as e:
+            print(f"Error checking {hut['name']}: {e}")
+
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+
+if __name__ == "__main__":
+    main()`;
+
+      const yamlCode = `# .github/workflows/monitor.yml
+name: Dolomiti Rifugi 24/7 Monitor
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-huts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4
+      - run: python rifugi_checker.py
+        env:
+          TARGET_EMAIL: 'kzyuval@gmail.com'
+          GMAIL_SENDER: \${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: \${{ secrets.GMAIL_APP_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: \${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: \${{ secrets.TELEGRAM_CHAT_ID }}
+      - run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          git add state.json || true
+          git commit -m "Auto-update state" || exit 0
+          git push
+`;
+
+      const pyEl = document.getElementById('code-python');
+      const yamlEl = document.getElementById('code-yaml');
+      if (pyEl) pyEl.innerText = pyCode;
+      if (yamlEl) yamlEl.innerText = yamlCode;
+      openModal('modal-export');
+    }
+
+    // Attach globals to window
+    window.openEmailModal = openEmailModal;
+    window.saveEmailSettings = saveEmailSettings;
+    window.sendTestEmail = sendTestEmail;
+    window.sendNotificationEmail = sendNotificationEmail;
+    window.openTelegramModal = openTelegramModal;
+    window.saveTelegramSettings = saveTelegramSettings;
+    window.testTelegramNotification = testTelegramNotification;
+    window.openExportModal = openExportModal;
+    window.openAddHutModal = openAddHutModal;
+    window.editHut = editHut;
+    window.deleteHut = deleteHut;
+    window.handleHutSubmit = handleHutSubmit;
+    window.checkAllHuts = checkAllHuts;
+    window.checkSingleHut = checkSingleHut;
+    window.simulateOpenAlert = simulateOpenAlert;
+    window.toggleHutStatus = toggleHutStatus;
+    window.playNotificationChime = playNotificationChime;
+    window.requestBrowserPermission = requestBrowserPermission;
+    window.clearActivityLog = clearActivityLog;
+    window.renderHuts = renderHuts;
+    window.setClusterFilter = setClusterFilter;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.copyCode = copyCode;
+    window.openHutWebsite = openHutWebsite;
+    window.copyModalLink = copyModalLink;
+
+    setInterval(() => {
+      remainingTimerSeconds--;
+      if (remainingTimerSeconds <= 0) {
+        remainingTimerSeconds = checkIntervalSeconds;
+        addActivityLog('טיימר אוטומטי: מתבצעת סריקת רקע...', 'info');
+        checkAllHuts();
+      }
+      const mins = Math.floor(remainingTimerSeconds / 60).toString().padStart(2, '0');
+      const secs = (remainingTimerSeconds % 60).toString().padStart(2, '0');
+      const timerEl = document.getElementById('auto-check-timer');
+      if (timerEl) {
+        timerEl.innerText = `סבב בעוד ${mins}:${secs}`;
+      }
+    }, 1000);
+
+    function initApp() {
+      renderStats();
+      renderHuts();
+      addActivityLog('מערכת הדולומיטים הופעלה: 4 אשכולות, 18 בקתות ממוקדות.', 'info');
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
   </script>
 </body>
 </html>
