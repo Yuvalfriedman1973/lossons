@@ -68,9 +68,9 @@
               <h1 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950">
                 Dolomiti Rifugi Radar
               </h1>
-              <span class="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-950 border border-orange-300 font-bold">אשכולות 1, 2, 3, 3א</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-950 border border-orange-300 font-bold">אשכולות 1 ו-2</span>
             </div>
-            <p class="text-xs text-slate-600 font-medium hidden sm:block">מעקב פתיחת הרשמות, חלוקה ל-4 אשכולות ותחליפים גיאוגרפיים</p>
+            <p class="text-xs text-slate-600 font-medium hidden sm:block">מעקב פתיחת הרשמות, חלוקה ל-2 אשכולות (לגאזואי ואבראו) ותחליפים גיאוגרפיים</p>
           </div>
         </div>
 
@@ -112,7 +112,7 @@
       <div class="bg-slate-200 border-2 border-slate-400 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
         <div>
           <span class="text-xs sm:text-sm text-slate-800 font-bold block">סה"כ בקתות באשכולות</span>
-          <span id="stat-total" class="text-2xl sm:text-3xl font-black text-slate-950 mt-1 block">18</span>
+          <span id="stat-total" class="text-2xl sm:text-3xl font-black text-slate-950 mt-1 block">10</span>
         </div>
         <div class="w-12 h-12 rounded-xl bg-slate-300 border border-slate-400 flex items-center justify-center text-xl text-slate-900 shadow-inner">
           📍
@@ -132,7 +132,7 @@
       <div class="bg-amber-100 border-2 border-amber-500 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
         <div>
           <span class="text-xs sm:text-sm text-amber-950 font-bold block">ממתינות לפתיחה</span>
-          <span id="stat-closed" class="text-2xl sm:text-3xl font-black text-amber-950 mt-1 block">18</span>
+          <span id="stat-closed" class="text-2xl sm:text-3xl font-black text-amber-950 mt-1 block">10</span>
         </div>
         <div class="w-12 h-12 rounded-xl bg-amber-200 border border-amber-400 flex items-center justify-center text-xl text-amber-950 shadow-inner">
           ⏳
@@ -162,7 +162,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
-            <span id="text-check-all">סרוק את כל 18 הבקתות</span>
+            <span id="text-check-all">סרוק את כל 10 הבקתות</span>
             <span>⚡</span>
           </button>
 
@@ -187,6 +187,157 @@
           <div class="relative flex-grow lg:w-64">
             <input type="text" id="search-input" oninput="renderHuts()" placeholder="חיפוש בקתה או אזור..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 pr-9 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-700 focus:ring-1 focus:ring-teal-700 transition font-medium">
             <span class="absolute right-3 top-2.5 text-slate-400 text-sm">🔍</span>
+          </div>
+          <select id="status-filter" onchange="renderHuts()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700 shrink-0">
+            <option value="ALL">כל הסטטוסים</option>
+            <option value="OPEN">פתוח בלבד 🟢</option>
+            <option value="CLOSED">ממתין לפתיחה ⏳</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Cluster Selection Tabs -->
+      <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+        <span class="text-xs font-black text-slate-700 ml-2">סינון תצוגה:</span>
+        <button onclick="setClusterFilter('ALL')" id="tab-all" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-slate-800 text-white border-slate-900 shadow-sm">
+          כל האשכולות (10)
+        </button>
+        <button onclick="setClusterFilter('PRIMARY_ONLY')" id="tab-primary" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-amber-50 hover:bg-amber-100 text-amber-950 border-amber-300">
+          👑 2 בחירות ראשיות (Lagazuoi, Averau)
+        </button>
+        <button onclick="setClusterFilter('LAGAZUOI')" id="tab-lagazuoi" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-sky-50 hover:bg-sky-100 text-sky-950 border-sky-300">
+          🔵 אשכול 1: לגאזואי (2)
+        </button>
+        <button onclick="setClusterFilter('AVERAU')" id="tab-averau" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-purple-50 hover:bg-purple-100 text-purple-950 border-purple-300">
+          🟣 אשכול 2: אבראו (8)
+        </button>
+      </div>
+    </div>
+
+    <!-- Clusters Container - Grouped by 4 distinct geographical areas -->
+    <div id="clusters-container" class="space-y-8">
+      <!-- Cluster sections rendered via JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-16 bg-white border-2 border-slate-300 rounded-2xl shadow-sm">
+      <div class="text-5xl mb-3">🏔️</div>
+      <h3 class="text-lg font-black text-slate-900">לא נמצאו בקתות תואמות לסינון</h3>
+      <p class="text-sm text-slate-600 mt-1">נסה לשנות את מונח החיפוש או ללחוץ על 'כל האשכולות'.</p>
+    </div>
+
+    <!-- Activity Log Panel -->
+    <div class="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">📜</span>
+          <h2 class="text-base font-black text-slate-950">יומן פעילות וסריקה בזמן אמת</h2>
+        </div>
+        <button onclick="clearActivityLog()" class="text-xs text-slate-600 hover:text-slate-950 underline font-bold">נקה יומן</button>
+      </div>
+      <div id="activity-log" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar text-xs font-mono">
+        <!-- Log entries -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Add / Edit Hut -->
+  <div id="modal-hut" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <button onclick="closeModal('modal-hut')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 id="modal-hut-title" class="text-xl font-black font-heading text-slate-950 mb-4 flex items-center gap-2">
+        <span>➕</span> הוספת בקתה חדשה לניטור
+      </h3>
+
+      <form id="form-hut" onsubmit="handleHutSubmit(event)" class="space-y-3.5">
+        <input type="hidden" id="hut-id">
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">שם הבקתה</label>
+          <input type="text" id="hut-name" required placeholder="למשל: Rifugio Salander" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">אשכול / שיוך גיאוגרפי</label>
+            <select id="hut-cluster" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700">
+              <option value="LAGAZUOI">🔵 אשכול 1: לגאזואי (Passo Falzarego)</option>
+              <option value="AVERAU">🟣 אשכול 2: אבראו (5 Torri / Passo Giau)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">סוג עדיפות</label>
+            <select id="hut-is-primary" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700">
+              <option value="false">🔄 תחליף ישיר</option>
+              <option value="true">👑 בחירה ראשונה (עדיפות עליונה)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">אזור בדולומיטים</label>
+            <input type="text" id="hut-region" required placeholder="Forcella Pecol / Pescul" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">גובה (מטרים)</label>
+            <input type="number" id="hut-altitude" placeholder="1657" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-amber-900 mb-1">🧭 קשר גיאוגרפי (הסבר עבור מי התחליף ומה המרחק)</label>
+          <input type="text" id="hut-substitute-info" placeholder="למשל: על צלע הרכס בשביל 561 / רכבל פרטצה" class="w-full bg-amber-50/60 border border-amber-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-amber-600 focus:bg-white font-medium">
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-sky-900 mb-1">📏 מרחק וזמן הגעה מבקתת היעד</label>
+          <input type="text" id="hut-distance" placeholder="למשל: 1.8 ק&quot;מ (כ-35 דקות עלייה בשביל 561)" class="w-full bg-sky-50/70 border border-sky-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-sky-600 focus:bg-white font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-800 mb-1">📅 צפי פתיחת הרשמה (חלון זמן משוער)</label>
+          <input type="text" id="hut-expected-opening" placeholder="למשל: דצמבר – ינואר" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">כתובת אתר דף ההרשמה / הזמנות (URL)</label>
+          <input type="url" id="hut-url" required placeholder="https://..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-mono text-xs">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">הערות ומידע נוסף</label>
+          <input type="text" id="hut-notes" placeholder="פרטים על ההזמנה, קיבולת, חדרים וכד'..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">מילות מפתח שמעידות על פתיחה</label>
+          <input type="text" id="hut-keywords" value="Prenota, Book Now, Disponibile, Available, Prenotazioni aperte" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+        </div>
+
+        <div class="pt-3 flex justify-end gap-3">
+          <button type="button" onclick="closeModal('modal-hut')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold">ביטול</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm shadow-md">שמור בקתה</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Telegram Bot Settings -->
+  <div id="modal-telegram" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative">
+      <button onclick="closeModal('modal-telegram')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      <h3 class="text-xl font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
+        <span>✈️</span> הגדרת התראות לטלגרם
+      </h3>
+      <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
+        התראות מתפרצות (Push) ישירות לנייד ברגע שנפתחת הרשמה לאחת הבקתות.
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">Telegram Bot Token</label>
+          <input type="text" id="tg-token" placeholder="למשל: 123456789:ABCdefGhIJKlmNoPQ..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-teal-700 focus:bg-white">
+          <span class="text-[11px]-2.5 text-slate-400 text-sm">🔍</span>
           </div>
           <select id="status-filter" onchange="renderHuts()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700 shrink-0">
             <option value="ALL">כל הסטטוסים</option>
