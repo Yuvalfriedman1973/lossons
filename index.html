@@ -337,165 +337,6 @@
         <div>
           <label class="block text-xs font-bold text-slate-800 mb-1">Telegram Bot Token</label>
           <input type="text" id="tg-token" placeholder="למשל: 123456789:ABCdefGhIJKlmNoPQ..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-teal-700 focus:bg-white">
-          <span class="text-[11px]-2.5 text-slate-400 text-sm">🔍</span>
-          </div>
-          <select id="status-filter" onchange="renderHuts()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700 shrink-0">
-            <option value="ALL">כל הסטטוסים</option>
-            <option value="OPEN">פתוח בלבד 🟢</option>
-            <option value="CLOSED">ממתין לפתיחה ⏳</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Bottom Row: Cluster Selection Tabs -->
-      <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
-        <span class="text-xs font-black text-slate-700 ml-2">סינון תצוגה:</span>
-        <button onclick="setClusterFilter('ALL')" id="tab-all" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-slate-800 text-white border-slate-900 shadow-sm">
-          כל האשכולות (18)
-        </button>
-        <button onclick="setClusterFilter('PRIMARY_ONLY')" id="tab-primary" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-amber-50 hover:bg-amber-100 text-amber-950 border-amber-300">
-          👑 4 בחירות ראשיות (Lagazuoi, Averau, Fiume, Salander)
-        </button>
-        <button onclick="setClusterFilter('LAGAZUOI')" id="tab-lagazuoi" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-sky-50 hover:bg-sky-100 text-sky-950 border-sky-300">
-          🔵 אשכול 1: לגאזואי (2)
-        </button>
-        <button onclick="setClusterFilter('AVERAU')" id="tab-averau" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-purple-50 hover:bg-purple-100 text-purple-950 border-purple-300">
-          🟣 אשכול 2: אבראו (8)
-        </button>
-        <button onclick="setClusterFilter('FIUME')" id="tab-fiume" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300">
-          🟢 אשכול 3: פיומה (3)
-        </button>
-        <button onclick="setClusterFilter('SABE')" id="tab-sabe" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-orange-50 hover:bg-orange-100 text-orange-950 border-orange-300">
-          🟠 אשכול 3א: סלנדר (5)
-        </button>
-      </div>
-    </div>
-
-    <!-- Clusters Container - Grouped by 4 distinct geographical areas -->
-    <div id="clusters-container" class="space-y-8">
-      <!-- Cluster sections rendered via JavaScript -->
-    </div>
-
-    <!-- Empty State -->
-    <div id="empty-state" class="hidden text-center py-16 bg-white border-2 border-slate-300 rounded-2xl shadow-sm">
-      <div class="text-5xl mb-3">🏔️</div>
-      <h3 class="text-lg font-black text-slate-900">לא נמצאו בקתות תואמות לסינון</h3>
-      <p class="text-sm text-slate-600 mt-1">נסה לשנות את מונח החיפוש או ללחוץ על 'כל האשכולות'.</p>
-    </div>
-
-    <!-- Activity Log Panel -->
-    <div class="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-sm">
-      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">📜</span>
-          <h2 class="text-base font-black text-slate-950">יומן פעילות וסריקה בזמן אמת</h2>
-        </div>
-        <button onclick="clearActivityLog()" class="text-xs text-slate-600 hover:text-slate-950 underline font-bold">נקה יומן</button>
-      </div>
-      <div id="activity-log" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar text-xs font-mono">
-        <!-- Log entries -->
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal: Add / Edit Hut -->
-  <div id="modal-hut" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-lg rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative max-h-[92vh] overflow-y-auto custom-scrollbar">
-      <button onclick="closeModal('modal-hut')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
-      <h3 id="modal-hut-title" class="text-xl font-black font-heading text-slate-950 mb-4 flex items-center gap-2">
-        <span>➕</span> הוספת בקתה חדשה לניטור
-      </h3>
-
-      <form id="form-hut" onsubmit="handleHutSubmit(event)" class="space-y-3.5">
-        <input type="hidden" id="hut-id">
-        <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1">שם הבקתה</label>
-          <input type="text" id="hut-name" required placeholder="למשל: Rifugio Salander" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-bold">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-800 mb-1">אשכול / שיוך גיאוגרפי</label>
-            <select id="hut-cluster" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700">
-              <option value="LAGAZUOI">🔵 אשכול 1: לגאזואי (Passo Falzarego)</option>
-              <option value="AVERAU">🟣 אשכול 2: אבראו (5 Torri / Passo Giau)</option>
-              <option value="FIUME">🟢 אשכול 3: פיומה (Monte Pelmo / Val Fiorentina)</option>
-              <option value="SABE">🟠 אשכול 3א: סלנדר (Forcella Pecol / Pescul)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-800 mb-1">סוג עדיפות</label>
-            <select id="hut-is-primary" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold focus:outline-none focus:border-teal-700">
-              <option value="false">🔄 תחליף ישיר</option>
-              <option value="true">👑 בחירה ראשונה (עדיפות עליונה)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-800 mb-1">אזור בדולומיטים</label>
-            <input type="text" id="hut-region" required placeholder="Forcella Pecol / Pescul" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-800 mb-1">גובה (מטרים)</label>
-            <input type="number" id="hut-altitude" placeholder="1657" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-black text-amber-900 mb-1">🧭 קשר גיאוגרפי (הסבר עבור מי התחליף ומה המרחק)</label>
-          <input type="text" id="hut-substitute-info" placeholder="למשל: על צלע הרכס בשביל 561 / רכבל פרטצה" class="w-full bg-amber-50/60 border border-amber-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-amber-600 focus:bg-white font-medium">
-        </div>
-
-        <div>
-          <label class="block text-xs font-black text-sky-900 mb-1">📏 מרחק וזמן הגעה מבקתת היעד</label>
-          <input type="text" id="hut-distance" placeholder="למשל: 1.8 ק&quot;מ (כ-35 דקות עלייה בשביל 561)" class="w-full bg-sky-50/70 border border-sky-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-sky-600 focus:bg-white font-bold">
-        </div>
-
-        <div>
-          <label class="block text-xs font-black text-slate-800 mb-1">📅 צפי פתיחת הרשמה (חלון זמן משוער)</label>
-          <input type="text" id="hut-expected-opening" placeholder="למשל: דצמבר – ינואר" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-bold">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1">כתובת אתר דף ההרשמה / הזמנות (URL)</label>
-          <input type="url" id="hut-url" required placeholder="https://..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-mono text-xs">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1">הערות ומידע נוסף</label>
-          <input type="text" id="hut-notes" placeholder="פרטים על ההזמנה, קיבולת, חדרים וכד'..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1">מילות מפתח שמעידות על פתיחה</label>
-          <input type="text" id="hut-keywords" value="Prenota, Book Now, Disponibile, Available, Prenotazioni aperte" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
-        </div>
-
-        <div class="pt-3 flex justify-end gap-3">
-          <button type="button" onclick="closeModal('modal-hut')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold">ביטול</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm shadow-md">שמור בקתה</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: Telegram Bot Settings -->
-  <div id="modal-telegram" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative">
-      <button onclick="closeModal('modal-telegram')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
-      <h3 class="text-xl font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
-        <span>✈️</span> הגדרת התראות לטלגרם
-      </h3>
-      <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
-        התראות מתפרצות (Push) ישירות לנייד ברגע שנפתחת הרשמה לאחת הבקתות.
-      </p>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1">Telegram Bot Token</label>
-          <input type="text" id="tg-token" placeholder="למשל: 123456789:ABCdefGhIJKlmNoPQ..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-teal-700 focus:bg-white">
           <span class="text-[11px] text-slate-500">מופקים מ-@BotFather בטלגרם.</span>
         </div>
 
@@ -522,7 +363,7 @@
     <div class="bg-white w-full max-w-md rounded-2xl p-6 border-2 border-slate-400 shadow-2xl relative">
       <button onclick="closeModal('modal-email')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
       <h3 class="text-xl font-black font-heading text-slate-950 mb-2 flex items-center gap-2">
-        <span>✉️️</span> התראות Gmail (kzyuval@gmail.com)
+        <span>✉</span> התראות Gmail (kzyuval@gmail.com)
       </h3>
       <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
         ברגע שהמערכת מזהה פתיחת הרשמה (באשכול או בתחליף), ישלח מייל מיידי עם קישור ישיר.
@@ -560,7 +401,7 @@
         <span>⚙️</span> הפעלה אוטומטית 24/7 בענן בחינם
       </h3>
       <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
-        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 18 הבקתות באשכולות 1, 2, 3 ו-3א.
+        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 10 הבקתות באשכולות 1 ו-2.
       </p>
 
       <div class="space-y-4">
@@ -653,34 +494,10 @@
           primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
           substituteCard: 'bg-white border-2 border-purple-300 hover:border-purple-500 shadow-sm'
         }
-      },
-      FIUME: {
-        id: 'FIUME',
-        name: 'אשכול 3: פיומה (Monte Pelmo / Val Fiorentina)',
-        badge: '🟢 אשכול פיומה',
-        description: 'מרגלות המונטה פלמו (Monte Pelmo). בקתת פיומה קטנה ואינטימית (20 מיטות בלבד!). ריפוג\'ו פאסו סטאולנצה נמצאת במרחק שעה ורבע הליכה קלה בלבד בשביל 472 ומהווה את התחליף המדויק ביותר בציר ה-Alta Via 1.',
-        themeClasses: {
-          wrapper: 'bg-emerald-50/90 border-2 border-emerald-400',
-          headerBg: 'bg-gradient-to-r from-emerald-800 to-teal-800 text-white',
-          primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
-          substituteCard: 'bg-white border-2 border-emerald-300 hover:border-emerald-500 shadow-sm'
-        }
-      },
-      SABE: {
-        id: 'SABE',
-        name: 'אשכול 3א: סלנדר (Forcella Pecol / Pescul)',
-        badge: '🟠 אשכול 3א (סלנדר)',
-        description: 'מעבר פקול (Forcella Pecol) ורכס פרטצה מעל פסקול. בקתת היעד הראשית היא Rifugio Salander. התחליפים מקיפים את מעלה רכס פרטצה (Fertazza, La Ciasela, Col dei Baldi) ועמק ואל פיורנטינה (Aquileia).',
-        themeClasses: {
-          wrapper: 'bg-orange-50/90 border-2 border-orange-400',
-          headerBg: 'bg-gradient-to-r from-amber-700 to-orange-700 text-white',
-          primaryCard: 'bg-white border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40',
-          substituteCard: 'bg-white border-2 border-orange-300 hover:border-orange-500 shadow-sm'
-        }
       }
     };
 
-    // Strictly 18 Huts belonging exclusively to the 4 clusters (1, 2, 3, 3a)
+    // Strictly 10 Huts belonging exclusively to clusters 1 & 2
     const INITIAL_HUTS = [
       // --- CLUSTER 1: LAGAZUOI (2) ---
       {
@@ -754,12 +571,12 @@
         altitude: 2575,
         url: 'https://www.rifugionuvolau.it',
         status: 'CLOSED',
-        expectedOpening: 'אמצע ינואר (10–20 בינואר)',
+        expectedOpening: 'תחילת ינואר (נבדק אישית ע"י יובל ✅)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
         keywords: 'Prenota, Booking, Open, Disponibile',
-        lastSnippet: 'סגור בעונת הסתיו. פרטים והרשמות לקיץ עולים בינואר.',
-        notes: 'הבקתה הוותיקה ביותר באזור קורטינה (1883), תצפית 360 מעלות פנורמית.'
+        lastSnippet: 'מועד פתיחת ההרשמה: תחילת ינואר (נבדק אישית ע"י יובל).',
+        notes: 'הבקתה הוותיקה ביותר באזור קורטינה (1883), תצפית 360 מעלות פנורמית. מועד הפתיחה לתחילת ינואר נבדק אישית ע"י יובל מול הבקתה.'
       },
       {
         id: 'scoiattoli',
@@ -874,168 +691,12 @@
         keywords: 'Prenota, Book, Table, Rooms, Disponibile, Contact',
         lastSnippet: 'מסעדת גורמה אלפינית ב-Passo Giau. פניות להזמנות: infodaaurelio@gmail.com',
         notes: 'בגובה 2,175 מטר במעבר ג\'יאו. ידועה במטבח מקומי משובח ביותר, נקודת סיום נהדרת למקטע אבראו.'
-      },
-
-      // --- CLUSTER 3: FIUME (3) ---
-      {
-        id: 'citta_di_fiume',
-        name: 'Rifugio Città di Fiume',
-        cluster: 'FIUME',
-        isPrimary: true,
-        priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
-        distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
-        substituteInfo: 'בקתת היעד למרגלות המונטה פלמו (20 מיטות בלבד ב-4 חדרים – נחטפת במהירות!)',
-        region: 'Monte Pelmo / Val Fiorentina',
-        altitude: 1918,
-        url: 'https://rifugiocittadifiume.it/prenota/',
-        status: 'CLOSED',
-        expectedOpening: 'סוף ינואר – תחילת פברואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Disponibile, Book, Richiesta, Available, Estate',
-        lastSnippet: 'בקתה אינטימית של מועדון CAI Fiume עם נוף מדהים לפלמו ולצ\'יווטה.',
-        notes: '20 מיטות בלבד! אחת הנקודות היפות והפופולריות ב-Alta Via 1. חובה לתפוס מיד עם פתיחת ההרשמה.'
-      },
-      {
-        id: 'passo_staulanza',
-        name: 'Rifugio Passo Staulanza',
-        cluster: 'FIUME',
-        isPrimary: false,
-        priorityLabel: '🔄 תחליף ישיר ל-Città di Fiume',
-        distanceFromPrimary: '4.2 ק"מ (שעה ורבע הליכה מתונה וקלה בשביל 472 ללא הפרשי גובה חדים)',
-        substituteInfo: 'שעה ורבע הליכה קלה בלבד בשביל 472 מפיומה! (במעבר סטאולנצה על ציר AV1)',
-        region: 'Passo Staulanza (1766m)',
-        altitude: 1766,
-        url: 'https://www.staulanza.it/',
-        status: 'CLOSED',
-        expectedOpening: 'דצמבר – תחילת ינואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Camere, Booking, Disponibile, Richiesta',
-        lastSnippet: 'התחליף הקלאסי של אלטה ויה 1 אם פיומה מלאה. נגיש גם לרכב.',
-        notes: 'במעבר סטאולנצה. מסעדה הררית משובחת, חדרים מרווחים ונקודת המשך מושלמת לקבוצת צ\'יווטה.'
-      },
-      {
-        id: 'rifugio_venezia',
-        name: 'Rifugio Venezia (Pelmo)',
-        cluster: 'FIUME',
-        isPrimary: false,
-        priorityLabel: '🔄 תחליף ל-Città di Fiume (מזרח פלמו)',
-        distanceFromPrimary: '5.5 ק"מ (כשעתיים ו-15 דק\' הליכה בשביל 472 העוקף את המונטה פלמו)',
-        substituteInfo: 'בצד המזרחי של המונטה פלמו, מחוברת בשביל 472 העוקף את הפלמו',
-        region: 'Monte Pelmo / Passo Rutorto',
-        altitude: 1946,
-        url: 'https://www.rifugiovenezia.it/',
-        status: 'CLOSED',
-        expectedOpening: 'ינואר – פברואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book, Open, Disponibile',
-        lastSnippet: 'הבקתה הראשונה שנבנתה בצד האיטלקי של הדולומיטים (1892).',
-        notes: 'תצפית נהדרת על עמק קאדורה והאנטלאו, גיבוי מעולה למקרה שאין מקום בפיומה.'
-      },
-
-      // --- CLUSTER 3a: SALANDER (5) ---
-      {
-        id: 'rifugio_salander',
-        name: 'Rifugio Salander',
-        cluster: 'SABE',
-        isPrimary: true,
-        priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
-        distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
-        substituteInfo: 'בקתת היעד הראשית במעבר פקול (Forcella Pecol) מעל פסקול',
-        region: 'Forcella Pecol / Pescul',
-        altitude: 1657,
-        url: 'https://www.valfiorentina.it/',
-        status: 'CLOSED',
-        expectedOpening: 'דצמבר – ינואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book, Camere, Disponibile',
-        lastSnippet: 'ממוקם על צלע הרכס בשביל 561 היורד ממעבר Pecol לכיוון פסקול.',
-        notes: 'בקתת היעד הראשית של אשכול 3א. יושבת במעבר פקול מעל פסקול ומהווה בסיס מצוין לרכס פרטצה.'
-      },
-      {
-        id: 'ristoro_fertazza',
-        name: 'Ristoro Fertazza',
-        cluster: 'SABE',
-        isPrimary: false,
-        priorityLabel: '🔄 תחליף ישיר ל-Salander (רכס פרטצה)',
-        distanceFromPrimary: '1.8 ק"מ (כ-35 דקות עלייה בשביל 561 לכיוון פסגת פרטצה)',
-        substituteInfo: 'תחנת האמצע של הרכבל מעל סלנדר עם נוף פנורמי מרהיב למונטה פלמו',
-        region: 'Monte Fertazza (1852m)',
-        altitude: 1852,
-        url: 'https://valfiorentinadolomiti.it/it/Ristoro-Fertazza/Home_Ristoro_Fertazza/Benvenuti-Rifugio-Fertazza.html',
-        status: 'CLOSED',
-        expectedOpening: 'דצמבר – תחילת ינואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Camere, Book, Disponibile, Info',
-        lastSnippet: 'בגובה 1,852 מ\' מול המונטה פלמו, עם סולריום ומטבח מסורתי.',
-        notes: 'בקתה ומסעדה אלפינית מומלצת. יושבת במעלה שביל 561 העולה ממעבר פקול.'
-      },
-      {
-        id: 'la_ciasela',
-        name: 'Ristoro La Ciasela',
-        cluster: 'SABE',
-        isPrimary: false,
-        priorityLabel: '🔄 תחליף ל-Salander (שביל 568)',
-        distanceFromPrimary: '2.0 ק"מ (כ-40 דקות הליכה בשביל 568/561)',
-        substituteInfo: 'בקתה כפרית מקסימה על שביל 568 מול נוף הפלמו והצ\'יווטה',
-        region: 'Monte Fertazza / Selva di Cadore',
-        altitude: 1800,
-        url: 'https://www.valfiorentina.it/',
-        status: 'CLOSED',
-        expectedOpening: 'ינואר – פברואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenotazioni, Booking, Disponibile, Ristoro',
-        lastSnippet: 'נקודת עצירה פנורמית פופולרית בדרך לפסגת פרטצה.',
-        notes: 'מתאימה במיוחד לעצירה ואירוח באווירה אלפינית שלווה על מדרונות פרטצה.'
-      },
-      {
-        id: 'rifugio_aquileia',
-        name: 'Rifugio Aquileia',
-        cluster: 'SABE',
-        isPrimary: false,
-        priorityLabel: '🔄 תחליף ל-Salander (מערב פלמו)',
-        distanceFromPrimary: '3.5 ק"מ (כשעה הליכה מתונה לכיוון מרגלות הפלמו המערבי)',
-        substituteInfo: 'למרגלות הצד המערבי של מונטה פלמו בעמק פיורנטינה, פתוח כל השנה',
-        region: 'Val Fiorentina / Versante Ovest Pelmo',
-        altitude: 1583,
-        url: 'https://www.rifugioaquileia.it/',
-        status: 'CLOSED',
-        expectedOpening: 'פתוח רציף / הרשמות קיץ בינואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Disponibile, Caparra, Pernottamento, Camere',
-        lastSnippet: 'מרפסת אלפינית רחבה מול הקיר המערבי האדיר של המונטה פלמו.',
-        notes: 'בקתה ותיקה ומבוקשת עם 25 מקומות לינה, אוכל נהדר וגישה נוחה מהעמק.'
-      },
-      {
-        id: 'col_dei_baldi',
-        name: 'Rifugio Col dei Baldi',
-        cluster: 'SABE',
-        isPrimary: false,
-        priorityLabel: '🔄 תחליף ל-Salander (מעבר Civetta)',
-        distanceFromPrimary: '4.2 ק"מ (כשעה ורבע הליכה לאורך שבילי קו הרכס מעל פסקול)',
-        substituteInfo: 'על אוכף Col dei Baldi המשקיף לרכס הצ\'יווטה ולאגם אלגה',
-        region: 'Col dei Baldi (1922m) / Alleghe',
-        altitude: 1922,
-        url: 'https://www.dolomitireview.com/rifugi/chalet-col-dei-baldi-panorami-e-piatti-sfiziosi-sullo-ski-civetta-dolomiti-superski/',
-        status: 'CLOSED',
-        expectedOpening: 'ינואר – פברואר',
-        lastChecked: 'לפני זמן קצר',
-        checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book, Chalet, Camere, Disponibile',
-        lastSnippet: 'בגובה 1,922 מ\' בנקודת המפגש של מתחם סקי צ\'יווטה עם מרפסת שמש ענקית.',
-        notes: 'אופציה מצוינת על קו הרכס למי שממשיך את המסלול לכיוון אגם אלגה או רכס הצ\'יווטה.'
       }
     ];
 
-    // State initialization strictly limited to the 18 huts across 4 clusters (1, 2, 3, 3a)
+    // State initialization strictly limited to the 10 huts across clusters 1 & 2
     let huts = INITIAL_HUTS;
-    safeStorage.set('dolomiti_huts_v12', JSON.stringify(huts));
+    safeStorage.set('dolomiti_huts_v16', JSON.stringify(huts));
 
     let activeClusterFilter = 'ALL';
 
@@ -1207,7 +868,7 @@
     });
 
     function saveHuts() {
-      safeStorage.set('dolomiti_huts_v12', JSON.stringify(huts));
+      safeStorage.set('dolomiti_huts_v14', JSON.stringify(huts));
       renderStats();
     }
 
@@ -1239,9 +900,7 @@
         'ALL': 'tab-all',
         'PRIMARY_ONLY': 'tab-primary',
         'LAGAZUOI': 'tab-lagazuoi',
-        'AVERAU': 'tab-averau',
-        'FIUME': 'tab-fiume',
-        'SABE': 'tab-sabe'
+        'AVERAU': 'tab-averau'
       };
 
       const activeBtn = document.getElementById(activeMap[filterKey]);
@@ -1283,8 +942,8 @@
         if (emptyState) emptyState.classList.add('hidden');
       }
 
-      // 3. Group by the 4 Selected Clusters (1, 2, 3, 3a)
-      const clusterOrder = ['LAGAZUOI', 'AVERAU', 'FIUME', 'SABE'];
+      // 3. Group by the 2 Selected Clusters (1 & 2)
+      const clusterOrder = ['LAGAZUOI', 'AVERAU'];
       let outputHtml = '';
 
       clusterOrder.forEach(clusterKey => {
@@ -1374,7 +1033,7 @@
               <div class="text-xs text-slate-700 flex items-center gap-1 mt-0.5 font-bold">
                 <span>📍 ${h.region}</span>
                 <span>•</span>
-                <span>⛰️️ ${h.altitude}m</span>
+                <span>⛰ ${h.altitude}m</span>
               </div>
             </div>
 
@@ -1510,7 +1169,7 @@
       const form = document.getElementById('form-hut');
       if (form) form.reset();
       document.getElementById('hut-id').value = '';
-      document.getElementById('hut-cluster').value = 'SABE';
+      document.getElementById('hut-cluster').value = 'AVERAU';
       document.getElementById('hut-is-primary').value = 'false';
       document.getElementById('hut-distance').value = '';
       document.getElementById('hut-expected-opening').value = 'דצמבר – ינואר';
@@ -1524,7 +1183,7 @@
 
       document.getElementById('hut-id').value = hut.id;
       document.getElementById('hut-name').value = hut.name;
-      document.getElementById('hut-cluster').value = hut.cluster || 'SABE';
+      document.getElementById('hut-cluster').value = hut.cluster || 'AVERAU';
       document.getElementById('hut-is-primary').value = hut.isPrimary ? 'true' : 'false';
       document.getElementById('hut-substitute-info').value = hut.substituteInfo || '';
       document.getElementById('hut-distance').value = hut.distanceFromPrimary || '';
@@ -1715,7 +1374,7 @@
       if (btn) btn.disabled = true;
       if (spinner) spinner.classList.remove('hidden');
       if (text) text.innerText = 'מבצע סריקה...';
-      addActivityLog('החלה סריקה כוללת של 18 הבקתות באשכולות 1, 2, 3 ו-3א...', 'info');
+      addActivityLog('החלה סריקה כוללת של 10 הבקתות באשכולות 1 ו-2...', 'info');
 
       for (const hut of huts) {
         await checkSingleHut(hut.id);
@@ -1724,8 +1383,8 @@
 
       if (btn) btn.disabled = false;
       if (spinner) spinner.classList.add('hidden');
-      if (text) text.innerText = 'סרוק את כל 18 הבקתות';
-      showToast('סריקת 18 הבקתות ב-4 האשכולות הסתיימה בהצלחה!', 'success');
+      if (text) text.innerText = 'סרוק את כל 10 הבקתות';
+      showToast('סריקת 10 הבקתות באשכולות 1 ו-2 הסתיימה בהצלחה!', 'success');
       remainingTimerSeconds = checkIntervalSeconds;
     }
 
@@ -1881,7 +1540,7 @@
       addActivityLog(`שולח מייל בדיקה לכתובת: ${emailInput}`, 'info');
 
       const subject = "🏔️ בדיקת התראה: מערכת ניטור אשכולות בדולומיטים מחוברת!";
-      const body = `היי יובל,\n\nזהו מייל בדיקה לאישור חיבור מערכת ההתראות עבור בקתות בדולומיטים.\n\nהבקתות מאורגנות לפי 4 הבחירות הראשיות שלך:\n1. אשכול 1: לגאזואי (Lagazuoi + Col Gallina)\n2. אשכול 2: אבראו (Averau + Nuvolau, Scoiattoli, 5 Torri, Fedare, Berghotel Passo Giau, Malga Giau, Piezza - Da Aurelio)\n3. אשכול 3: פיומה (Città di Fiume + Passo Staulanza, Rifugio Venezia)\n4. אשכול 3א: סלנדר (Rifugio Salander + Fertazza, La Ciasela, Aquileia, Col dei Baldi)\n\nמועד הבדיקה: ${new Date().toLocaleString('he-IL')}\nכתובת יעד: ${emailInput}`;
+      const body = `היי יובל,\n\nזהו מייל בדיקה לאישור חיבור מערכת ההתראות עבור בקתות בדולומיטים.\n\nהבקתות מאורגנות לפי 2 הבחירות הראשיות שלך:\n1. אשכול 1: לגאזואי (Lagazuoi + Col Gallina)\n2. אשכול 2: אבראו (Averau + Nuvolau, Scoiattoli, 5 Torri, Fedare, Berghotel Passo Giau, Malga Giau, Piezza - Da Aurelio)\n\nמועד הבדיקה: ${new Date().toLocaleString('he-IL')}\nכתובת יעד: ${emailInput}`;
 
       let sent = false;
       if (keyInput) {
@@ -2117,7 +1776,7 @@ jobs:
     function initApp() {
       renderStats();
       renderHuts();
-      addActivityLog('מערכת הדולומיטים הופעלה: אשכולות 1, 2, 3 ו-3א (18 בקתות ממוקדות).', 'info');
+      addActivityLog('מערכת הדולומיטים הופעלה: אשכולות 1 ו-2 (10 בקתות ממוקדות).', 'info');
     }
 
     if (document.readyState === 'loading') {
