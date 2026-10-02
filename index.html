@@ -192,6 +192,7 @@
             <option value="ALL">כל הסטטוסים</option>
             <option value="OPEN">פתוח בלבד 🟢</option>
             <option value="CLOSED">ממתין לפתיחה ⏳</option>
+            <option value="FULL">תפוסה מלאה (Full) 🚫</option>
           </select>
         </div>
       </div>
@@ -665,13 +666,13 @@
         region: 'Passo Giau / San Vito di Cadore',
         altitude: 2005,
         url: 'https://www.malgagiau.it/',
-        status: 'CLOSED',
-        expectedOpening: 'פברואר – מרץ (עונתי כפרי)',
-        lastChecked: 'לפני זמן קצר',
+        status: 'FULL',
+        expectedOpening: '🚫 תפוסה מלאה (Fully Booked)',
+        lastChecked: 'עודכן ע"י יובל',
         checkMode: 'SCRAPER',
         keywords: 'Prenotazioni, Booking, Tavoli, Camere, Aperto',
-        lastSnippet: 'חווה אלפינית הפותחת קבלת אורחים לקראת האביב.',
-        notes: 'חווה אלפינית אותנטית בדרך למעבר ג\'יאו, מתמחה בגבינות מקומיות ואירוח כפרי.'
+        lastSnippet: 'החווה סומנה בתפוסה מלאה (Fully Booked)',
+        notes: 'חווה אלפינית בדרך למעבר ג\'יאו. סומנה ע"י יובל בתפוסה מלאה (Fully Booked).'
       },
       {
         id: 'piezza_da_aurelio',
@@ -696,7 +697,7 @@
 
     // State initialization strictly limited to the 10 huts across clusters 1 & 2
     let huts = INITIAL_HUTS;
-    safeStorage.set('dolomiti_huts_v16', JSON.stringify(huts));
+    safeStorage.set('dolomiti_huts_v18', JSON.stringify(huts));
 
     let activeClusterFilter = 'ALL';
 
@@ -868,7 +869,7 @@
     });
 
     function saveHuts() {
-      safeStorage.set('dolomiti_huts_v14', JSON.stringify(huts));
+      safeStorage.set('dolomiti_huts_v18', JSON.stringify(huts));
       renderStats();
     }
 
@@ -880,7 +881,7 @@
 
       if (totalEl) totalEl.innerText = huts.length;
       const openCount = huts.filter(h => h.status === 'OPEN').length;
-      const closedCount = huts.length - openCount;
+      const closedCount = huts.filter(h => h.status === 'CLOSED').length;
       
       if (openEl) openEl.innerText = openCount;
       if (closedEl) closedEl.innerText = closedCount;
@@ -992,11 +993,15 @@
 
     function renderHutCard(h, clusterConfig) {
       const isOpen = h.status === 'OPEN';
+      const isFull = h.status === 'FULL' || h.status === 'FULLY_BOOKED';
       const isPrimary = h.isPrimary === true;
 
       let cardStyle = isPrimary ? clusterConfig.themeClasses.primaryCard : clusterConfig.themeClasses.substituteCard;
       if (isOpen) {
         cardStyle += ' status-pulse-open ring-4 ring-emerald-500/60';
+      } else if (isFull) {
+        // High-contrast, dark prominent styling for fully booked huts (e.g. Malga Giau)
+        cardStyle = 'bg-slate-900 border-2 border-rose-500 shadow-2xl ring-2 ring-rose-500/50 text-slate-100 hover:border-rose-400';
       }
 
       return `
@@ -1006,7 +1011,9 @@
             <!-- Priority & Status Badges -->
             <div class="flex items-center justify-between gap-2 mb-3">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black shadow-sm ${
-                isPrimary 
+                isFull
+                  ? 'bg-rose-950/90 text-rose-300 border border-rose-700'
+                  : isPrimary 
                   ? 'bg-amber-400 text-amber-950 border border-amber-500' 
                   : 'bg-slate-100 text-slate-800 border border-slate-300'
               }">
@@ -1017,20 +1024,23 @@
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black shrink-0 ${
                 isOpen 
                   ? 'bg-emerald-500 text-white border border-emerald-600 shadow-sm' 
+                  : isFull
+                  ? 'bg-rose-600 text-white border border-rose-400 shadow-md ring-2 ring-rose-400/40 animate-pulse'
                   : 'bg-amber-200 text-amber-950 border border-amber-400 shadow-sm'
               }">
-                <span class="w-2 h-2 rounded-full ${isOpen ? 'bg-white animate-ping' : 'bg-amber-800'}"></span>
-                ${isOpen ? 'הרשמה פתוחה!' : 'טרם נפתחה'}
+                <span class="w-2 h-2 rounded-full ${isOpen ? 'bg-white animate-ping' : isFull ? 'bg-white' : 'bg-amber-800'}"></span>
+                ${isOpen ? 'הרשמה פתוחה!' : isFull ? 'תפוסה מלאה (Full) 🚫' : 'טרם נפתחה'}
               </span>
             </div>
 
             <!-- Hut Name & Region -->
             <div class="mb-2">
-              <h3 class="text-xl font-black font-heading text-slate-950 flex items-center gap-1.5">
+              <h3 class="text-xl font-black font-heading flex items-center gap-1.5 ${isFull ? 'text-white' : 'text-slate-950'}">
                 ${h.name}
                 ${isPrimary ? '<span class="text-amber-500 text-base" title="בחירה ראשונה">⭐</span>' : ''}
+                ${isFull ? '<span class="text-rose-400 text-[11px] px-2 py-0.5 rounded-full bg-rose-950 border border-rose-700 font-bold">🚫 FULL</span>' : ''}
               </h3>
-              <div class="text-xs text-slate-700 flex items-center gap-1 mt-0.5 font-bold">
+              <div class="text-xs ${isFull ? 'text-slate-300' : 'text-slate-700'} flex items-center gap-1 mt-0.5 font-bold">
                 <span>📍 ${h.region}</span>
                 <span>•</span>
                 <span>⛰ ${h.altitude}m</span>
@@ -1039,72 +1049,102 @@
 
             <!-- Precise Distance from Target Hut Badge -->
             <div class="rounded-xl px-3 py-2 mb-2.5 flex items-start gap-2 border shadow-sm ${
-              isPrimary 
+              isFull
+                ? 'bg-slate-800/95 border-rose-900/60 text-slate-200'
+                : isPrimary 
                 ? 'bg-amber-100/90 border-amber-300 text-amber-950' 
                 : 'bg-sky-50 border-sky-300 text-sky-950'
             }">
-              <span class="text-base shrink-0">${isPrimary ? '🎯' : '📏'}</span>
+              <span class="text-base shrink-0">${isFull ? '🚫' : isPrimary ? '🎯' : '📏'}</span>
               <div class="text-xs leading-snug">
-                <span class="block font-black text-slate-900">${isPrimary ? 'נקודת המוצא (בקתת היעד):' : 'מרחק מבקתת היעד:'}</span>
+                <span class="block font-black ${isFull ? 'text-rose-300' : 'text-slate-900'}">${isPrimary ? 'נקודת המוצא (בקתת היעד):' : 'מרחק מבקתת היעד:'}</span>
                 <span class="font-bold">${h.distanceFromPrimary || (isPrimary ? 'בקתת היעד הראשית (0 ק"מ)' : 'מחוברת באשכול')}</span>
               </div>
             </div>
 
             <!-- Relationship to Main Target -->
-            <div class="text-xs text-slate-900 font-bold p-2.5 rounded-xl mb-3 border ${
-              isPrimary ? 'bg-amber-50 border-amber-300 text-amber-950' : 'bg-slate-100 border-slate-300'
-            } flex items-start gap-2 shadow-inner">
-              <span class="text-base">${isPrimary ? '👑' : '🧭'}</span>
+            <div class="text-xs font-bold p-2.5 rounded-xl mb-3 border flex items-start gap-2 shadow-inner ${
+              isFull
+                ? 'bg-slate-800/95 border-slate-700 text-slate-200'
+                : isPrimary 
+                ? 'bg-amber-50 border-amber-300 text-amber-950' 
+                : 'bg-slate-100 border-slate-300 text-slate-900'
+            }">
+              <span class="text-base">${isFull ? '📌' : isPrimary ? '👑' : '🧭'}</span>
               <div class="leading-snug">
-                <span class="block font-black text-slate-950">${isPrimary ? 'מעמד: בקתת יעד עיקרית' : 'מיקום ויחס לבקתת היעד:'}</span>
-                <span class="font-medium">${h.substituteInfo || 'בקתת יעד'}</span>
+                <span class="block font-black ${isFull ? 'text-slate-100' : 'text-slate-950'}">${isPrimary ? 'מעמד: בקתת יעד עיקרית' : 'מיקום ויחס לבקתת היעד:'}</span>
+                <span class="font-medium ${isFull ? 'text-slate-300' : ''}">${h.substituteInfo || 'בקתת יעד'}</span>
               </div>
             </div>
 
             <!-- Expected Opening Window -->
-            <div class="flex items-center gap-2 text-xs font-black text-amber-950 bg-amber-100 border-2 border-amber-400 px-3 py-2 rounded-xl mb-3 shadow-sm">
-              <span class="text-sm">📅</span>
-              <span class="text-slate-800">צפי פתיחה:</span>
-              <span class="text-amber-950 font-black">${h.expectedOpening || 'ינואר – פברואר'}</span>
+            <div class="flex items-center gap-2 text-xs font-black px-3 py-2 rounded-xl mb-3 shadow-sm border-2 ${
+              isFull
+                ? 'bg-rose-950/95 border-rose-600 text-rose-200'
+                : 'bg-amber-100 border-amber-400 text-amber-950'
+            }">
+              <span class="text-sm">${isFull ? '🚫' : '📅'}</span>
+              <span class="${isFull ? 'text-rose-300' : 'text-slate-800'}">סטטוס פתיחה:</span>
+              <span class="font-black ${isFull ? 'text-white' : 'text-amber-950'}">${h.expectedOpening || 'ינואר – פברואר'}</span>
             </div>
 
             <!-- Hut Notes -->
-            <p class="text-xs text-slate-800 mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 leading-relaxed font-semibold">
+            <p class="text-xs mb-3 p-2.5 rounded-xl border leading-relaxed font-semibold ${
+              isFull
+                ? 'bg-slate-800/90 border-slate-700 text-slate-300'
+                : 'bg-slate-50 border-slate-200 text-slate-800'
+            }">
               ${h.notes || 'בקתת הרים פופולרית בדולומיטים.'}
             </p>
 
             <!-- Last Scanned Indicator -->
-            <div class="text-[11px] text-slate-100 font-mono bg-slate-950 p-2.5 rounded-xl border border-slate-800 mb-4 break-words shadow-inner">
-              <span class="text-teal-400 font-bold block mb-0.5">🔍 אינדיקטור / טקסט אחרון שזוהה:</span>
+            <div class="text-[11px] font-mono p-2.5 rounded-xl border mb-4 break-words shadow-inner ${
+              isFull
+                ? 'bg-black/90 border-rose-900/60 text-slate-200'
+                : 'bg-slate-950 border-slate-800 text-slate-100'
+            }">
+              <span class="${isFull ? 'text-rose-400' : 'text-teal-400'} font-bold block mb-0.5">🔍 אינדיקטור / טקסט אחרון שזוהה:</span>
               "${h.lastSnippet || 'ממתין לסריקה ראשונית'}"
             </div>
           </div>
 
           <!-- Action Buttons -->
-          <div class="pt-3 border-t border-slate-200 flex flex-col gap-2">
-            <div class="flex items-center justify-between text-[11px] text-slate-600 font-bold">
+          <div class="pt-3 border-t ${isFull ? 'border-slate-700' : 'border-slate-200'} flex flex-col gap-2">
+            <div class="flex items-center justify-between text-[11px] font-bold ${isFull ? 'text-slate-400' : 'text-slate-600'}">
               <span>בדיקה: ${h.lastChecked}</span>
               <span>מצב: 🌐 Scraper</span>
             </div>
 
             <div class="grid grid-cols-3 gap-2 mt-1">
-              <button onclick="checkSingleHut('${h.id}')" id="btn-check-${h.id}" class="col-span-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold border border-slate-300 transition flex items-center justify-center gap-1 shadow-sm">
+              <button onclick="checkSingleHut('${h.id}')" id="btn-check-${h.id}" class="col-span-1 px-2.5 py-2 rounded-xl text-xs font-bold border transition flex items-center justify-center gap-1 shadow-sm ${
+                isFull
+                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-600'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300'
+              }">
                 <span>⚡</span> בדוק
               </button>
 
-              <button onclick="toggleHutStatus('${h.id}')" title="החלף סטטוס ידנית לבדיקה" class="col-span-1 px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold border border-slate-300 transition shadow-sm">
-                ${isOpen ? 'סמן כסגור' : 'סמן כפתוח'}
+              <button onclick="toggleHutStatus('${h.id}')" title="החלף סטטוס ידנית לבדיקה" class="col-span-1 px-2.5 py-2 rounded-xl text-xs font-bold border transition shadow-sm ${
+                isFull
+                  ? 'bg-rose-900/60 hover:bg-rose-800 text-rose-200 border-rose-700'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300'
+              }">
+                ${isOpen ? 'סמן כסגור' : isFull ? 'סמן כפתוח' : 'סמן כתפוס'}
               </button>
 
-              <button onclick="openHutWebsite('${h.url}', '${h.name.replace(/'/g, "\\'")}')" class="col-span-1 px-2.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition text-center flex items-center justify-center gap-1 shadow-md">
+              <button onclick="openHutWebsite('${h.url}', '${h.name.replace(/'/g, "\\'")}')" class="col-span-1 px-2.5 py-2 rounded-xl text-white text-xs font-bold transition text-center flex items-center justify-center gap-1 shadow-md ${
+                isFull
+                  ? 'bg-rose-700 hover:bg-rose-800'
+                  : 'bg-teal-700 hover:bg-teal-800'
+              }">
                 <span>🔗</span> אתר
               </button>
             </div>
 
             <!-- Edit / Delete links -->
             <div class="flex justify-between items-center mt-2 px-1">
-              <button onclick="editHut('${h.id}')" class="text-[11px] text-teal-800 hover:text-teal-950 font-bold underline">ערוך בקתה וצפי</button>
-              <button onclick="deleteHut('${h.id}')" class="text-[11px] text-rose-700 hover:text-rose-950 font-bold">הסר</button>
+              <button onclick="editHut('${h.id}')" class="text-[11px] font-bold underline ${isFull ? 'text-rose-400 hover:text-rose-300' : 'text-teal-800 hover:text-teal-950'}">ערוך בקתה וצפי</button>
+              <button onclick="deleteHut('${h.id}')" class="text-[11px] text-rose-400 hover:text-rose-300 font-bold">הסר</button>
             </div>
           </div>
 
@@ -1275,12 +1315,19 @@
     function toggleHutStatus(id) {
       const hut = huts.find(h => h.id === id);
       if (!hut) return;
-      hut.status = hut.status === 'OPEN' ? 'CLOSED' : 'OPEN';
+      if (hut.status === 'CLOSED') {
+        hut.status = 'OPEN';
+      } else if (hut.status === 'OPEN') {
+        hut.status = 'FULL';
+      } else {
+        hut.status = 'CLOSED';
+      }
       hut.lastChecked = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
       saveHuts();
       renderHuts();
-      showToast(`סטטוס ${hut.name} שונה ל-${hut.status === 'OPEN' ? 'פתוח' : 'סגור'}`, 'info');
-      addActivityLog(`הסטטוס של ${hut.name} הוגדר ידנית כ-${hut.status}`, 'info');
+      const statusLabels = { OPEN: 'פתוח 🟢', FULL: 'תפוסה מלאה 🚫', CLOSED: 'סגור/ממתין ⏳' };
+      showToast(`סטטוס ${hut.name} שונה ל-${statusLabels[hut.status]}`, 'info');
+      addActivityLog(`הסטטוס של ${hut.name} הוגדר כ-${statusLabels[hut.status]}`, 'info');
     }
 
     async function checkSingleHut(id) {
