@@ -68,7 +68,7 @@
               <h1 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950">
                 Dolomiti Rifugi Radar
               </h1>
-              <span class="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-950 border border-orange-300 font-bold">אשכולות 1 ו-2</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-950 border border-orange-300 font-bold">אשכולות 1 ו-2 (14 בקתות)</span>
             </div>
             <p class="text-xs text-slate-600 font-medium hidden sm:block">מעקב פתיחת הרשמות, חלוקה ל-2 אשכולות (לגאזואי ואבראו) ותחליפים גיאוגרפיים</p>
           </div>
@@ -112,7 +112,7 @@
       <div class="bg-slate-200 border-2 border-slate-400 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
         <div>
           <span class="text-xs sm:text-sm text-slate-800 font-bold block">סה"כ בקתות באשכולות</span>
-          <span id="stat-total" class="text-2xl sm:text-3xl font-black text-slate-950 mt-1 block">10</span>
+          <span id="stat-total" class="text-2xl sm:text-3xl font-black text-slate-950 mt-1 block">14</span>
         </div>
         <div class="w-12 h-12 rounded-xl bg-slate-300 border border-slate-400 flex items-center justify-center text-xl text-slate-900 shadow-inner">
           📍
@@ -132,7 +132,7 @@
       <div class="bg-amber-100 border-2 border-amber-500 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm">
         <div>
           <span class="text-xs sm:text-sm text-amber-950 font-bold block">ממתינות לפתיחה</span>
-          <span id="stat-closed" class="text-2xl sm:text-3xl font-black text-amber-950 mt-1 block">10</span>
+          <span id="stat-closed" class="text-2xl sm:text-3xl font-black text-amber-950 mt-1 block">13</span>
         </div>
         <div class="w-12 h-12 rounded-xl bg-amber-200 border border-amber-400 flex items-center justify-center text-xl text-amber-950 shadow-inner">
           ⏳
@@ -162,7 +162,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
-            <span id="text-check-all">סרוק את כל 10 הבקתות</span>
+            <span id="text-check-all">סרוק את כל 14 הבקתות</span>
             <span>⚡</span>
           </button>
 
@@ -201,13 +201,13 @@
       <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
         <span class="text-xs font-black text-slate-700 ml-2">סינון תצוגה:</span>
         <button onclick="setClusterFilter('ALL')" id="tab-all" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-slate-800 text-white border-slate-900 shadow-sm">
-          כל האשכולות (10)
+          כל האשכולות (14)
         </button>
         <button onclick="setClusterFilter('PRIMARY_ONLY')" id="tab-primary" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-amber-50 hover:bg-amber-100 text-amber-950 border-amber-300">
           👑 2 בחירות ראשיות (Lagazuoi, Averau)
         </button>
         <button onclick="setClusterFilter('LAGAZUOI')" id="tab-lagazuoi" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-sky-50 hover:bg-sky-100 text-sky-950 border-sky-300">
-          🔵 אשכול 1: לגאזואי (2)
+          🔵 אשכול 1: לגאזואי (6)
         </button>
         <button onclick="setClusterFilter('AVERAU')" id="tab-averau" class="cluster-tab px-3 py-1.5 rounded-xl text-xs font-black transition border bg-purple-50 hover:bg-purple-100 text-purple-950 border-purple-300">
           🟣 אשכול 2: אבראו (8)
@@ -331,7 +331,7 @@
         <span>✈️</span> הגדרת התראות לטלגרם
       </h3>
       <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
-        התראות מתפרצות (Push) ישירות לנייד ברגע שנפתחת הרשמה לאחת הבקתות.
+        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 15 הבקתות באשכולות 1 ו-2.
       </p>
 
       <div class="space-y-4">
@@ -474,9 +474,9 @@
     const CLUSTERS_CONFIG = {
       LAGAZUOI: {
         id: 'LAGAZUOI',
-        name: 'אשכול 1: לגאזואי (Passo Falzarego)',
+        name: 'אשכול 1: לגאזואי (Passo Falzarego, Valparola, Scotoni & Tofane)',
         badge: '🔵 אשכול לגאזואי',
-        description: 'רכס לגאזואי ומעבר פלצרגו. אם לגאזואי בפסגה מלאה, קול גאלינה במעבר היא נקודת הלינה הישירה ביותר ממנה עולים ברכבל תוך דקות.',
+        description: 'רכס לגאזואי, מעברי פלצרגו וואלפארולה, עמק סקוטוני ומורדות הטופאנה. 5 תחליפים המכסים את כל צירי העלייה, הירידה והחיבור לאבראו.',
         themeClasses: {
           wrapper: 'bg-sky-50/90 border-2 border-sky-400',
           headerBg: 'bg-gradient-to-r from-sky-700 to-teal-700 text-white',
@@ -498,9 +498,9 @@
       }
     };
 
-    // Strictly 10 Huts belonging exclusively to clusters 1 & 2
+    // Strictly 14 Huts belonging exclusively to clusters 1 & 2
     const INITIAL_HUTS = [
-      // --- CLUSTER 1: LAGAZUOI (2) ---
+      // --- CLUSTER 1: LAGAZUOI (6) ---
       {
         id: 'lagazuoi',
         name: 'Rifugio Lagazuoi',
@@ -525,7 +525,7 @@
         name: 'Rifugio Col Gallina',
         cluster: 'LAGAZUOI',
         isPrimary: false,
-        priorityLabel: '🔄 תחליף ישיר ל-Lagazuoi',
+        priorityLabel: '🔄 תחליף ישיר (מעגל 1: פלצרגו)',
         distanceFromPrimary: '3.5 ק"מ (כשעתיים הליכה בשביל 401/402, או 3 דק\' ברכבל ישיר ממעבר פלצרגו)',
         substituteInfo: 'למרגלות הרכס במעבר פלצרגו – רכבל ישיר בבוקר ללגאזואי',
         region: 'Passo Falzarego / Cortina',
@@ -538,6 +538,82 @@
         keywords: 'Prenota, Book Now, Booking, Camere, Disponibile',
         lastSnippet: 'פועל בחורף ובקיץ, פותח חלון הרשמות מוקדם בסוף הסתיו.',
         notes: 'במעבר פלצרגו. גישה נוחה ישירות מהכביש ונקודת יציאה מושלמת לרכס לגאזואי.'
+      },
+      {
+        id: 'passo_valparola',
+        name: 'Rifugio Passo Valparola',
+        cluster: 'LAGAZUOI',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר (מעגל 1: ואלפארולה)',
+        distanceFromPrimary: '3.8 ק"מ (כשעתיים עלייה בשביל 20B / Kaiserjäger, או 5 דק\' ברכב לרכבל)',
+        substituteInfo: 'על שפת אגם ואלפארולה – חיבור שבילים ישיר (20B) לפסגת לגאזואי',
+        region: 'Passo Valparola (2168m)',
+        altitude: 2168,
+        url: 'https://rifugiopassovalparola.it/',
+        status: 'CLOSED',
+        expectedOpening: 'נובמבר – דצמבר (פתוח גם בחורף)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Book, Rooms, Camere, Disponibile, Info',
+        lastSnippet: 'בקתה שקטה על שפת האגם במעבר ואלפארולה.',
+        notes: 'שוכנת במעבר ואלפארולה הפסטורלי מול Forte Tre Sassi. שביל Kaiserjäger מחבר אותה ישירות לפסגה.'
+      },
+      {
+        id: 'scotoni',
+        name: 'Rifugio Scotoni',
+        cluster: 'LAGAZUOI',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף ישיר (מעגל 2: ואל בדיה)',
+        distanceFromPrimary: '3.5 ק"מ (שעה ו-45 דק\' עלייה בשביל 20 דרך אגם לגאזואי)',
+        substituteInfo: 'בעמק אלפיני ירוק מתחת לאגם לגאזואי – מטבח גורמה ועלייה ישירה בבוקר',
+        region: 'Alpe di Lagazuoi / San Cassiano',
+        altitude: 1985,
+        url: 'https://www.scotoni.it/',
+        status: 'CLOSED',
+        expectedOpening: 'דצמבר – תחילת ינואר (מייל: info@scotoni.it)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Book, Prenota, Disponibile, Camere, Rooms, Request',
+        lastSnippet: 'בקתת בוטיק מבוקשת במיוחד עם מסעדה מעולה על שביל 20.',
+        notes: 'האלטרנטיבה המושלמת לצועדי אלטה ויה 1 המגיעים מצפון. מסעדת בשרים משובחת, סאונה אלפינית ונוף צוקים אדיר.'
+      },
+      {
+        id: 'dibona',
+        name: 'Rifugio Angelo Dibona',
+        cluster: 'LAGAZUOI',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף (מעגל 3: טופאנה/אבראו)',
+        distanceFromPrimary: '5.5 ק"מ (כשעתיים וחצי הליכה בשבילים 402 ו-404 דרך Forcella Col dei Bos)',
+        substituteInfo: 'למרגלות ה-Tofana di Rozes – תחנת מעבר מושלמת בין לגאזואי ל-5 Torri',
+        region: 'Tofana di Rozes / Cortina',
+        altitude: 2083,
+        url: 'https://rifugiodibona.com/',
+        status: 'CLOSED',
+        expectedOpening: 'ינואר – פברואר',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Book, Prenotazioni, Camere, Rooms, Disponibile',
+        lastSnippet: 'בקתה מרווחת ומסבירת פנים למרגלות מצוקי הטופאנה.',
+        notes: 'בקתה גדולה (כ-50 מיטות) עם מטבח הררי עשיר. מיקום אסטרטגי מצוין למי שממשיך למחרת לאבראו.'
+      },
+      {
+        id: 'giussani',
+        name: 'Rifugio Camillo Giussani',
+        cluster: 'LAGAZUOI',
+        isPrimary: false,
+        priorityLabel: '🔄 תחליף אלפיני (מעגל 3: לב הטופאנה)',
+        distanceFromPrimary: '7.0 ק"מ (כ-3.5 שעות הליכה דרך Col dei Bos ואוכף Fontananegra)',
+        substituteInfo: 'בגובה 2,580 מ\' באוכף פונטננגרה – חלופה אלפינית גבוהה ומחוספסת',
+        region: 'Tofana / Cortina d\'Ampezzo',
+        altitude: 2580,
+        url: 'https://www.rifugiogiussani.it/',
+        status: 'CLOSED',
+        expectedOpening: 'ינואר – פברואר (בקתת CAI Cortina)',
+        lastChecked: 'לפני זמן קצר',
+        checkMode: 'SCRAPER',
+        keywords: 'Prenota, Booking, Rifugio, Posti letto, Disponibile',
+        lastSnippet: 'בקתת מועדון האלפים (CAI) בלב רכס הטופאנה.',
+        notes: 'חוויה אלפינית בראש המצוקים הסלעיים. מתאימה למי שמחפש לינה בגובה רב במקום לגאזואי.'
       },
 
       // --- CLUSTER 2: AVERAU (8) ---
@@ -695,9 +771,9 @@
       }
     ];
 
-    // State initialization strictly limited to the 10 huts across clusters 1 & 2
+    // State initialization strictly limited to the 14 huts across clusters 1 & 2
     let huts = INITIAL_HUTS;
-    safeStorage.set('dolomiti_huts_v18', JSON.stringify(huts));
+    safeStorage.set('dolomiti_huts_v20', JSON.stringify(huts));
 
     let activeClusterFilter = 'ALL';
 
@@ -1421,7 +1497,7 @@
       if (btn) btn.disabled = true;
       if (spinner) spinner.classList.remove('hidden');
       if (text) text.innerText = 'מבצע סריקה...';
-      addActivityLog('החלה סריקה כוללת של 10 הבקתות באשכולות 1 ו-2...', 'info');
+      addActivityLog('החלה סריקה כוללת של 14 הבקתות באשכולות 1 ו-2...', 'info');
 
       for (const hut of huts) {
         await checkSingleHut(hut.id);
@@ -1430,8 +1506,8 @@
 
       if (btn) btn.disabled = false;
       if (spinner) spinner.classList.add('hidden');
-      if (text) text.innerText = 'סרוק את כל 10 הבקתות';
-      showToast('סריקת 10 הבקתות באשכולות 1 ו-2 הסתיימה בהצלחה!', 'success');
+      if (text) text.innerText = 'סרוק את כל 14 הבקתות';
+      showToast('סריקת 14 הבקתות באשכולות 1 ו-2 הסתיימה בהצלחה!', 'success');
       remainingTimerSeconds = checkIntervalSeconds;
     }
 
@@ -1823,7 +1899,7 @@ jobs:
     function initApp() {
       renderStats();
       renderHuts();
-      addActivityLog('מערכת הדולומיטים הופעלה: אשכולות 1 ו-2 (10 בקתות ממוקדות).', 'info');
+      addActivityLog('מערכת הדולומיטים הופעלה: אשכולות 1 ו-2 (14 בקתות ממוקדות).', 'info');
     }
 
     if (document.readyState === 'loading') {
