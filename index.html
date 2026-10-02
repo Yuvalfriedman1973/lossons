@@ -589,12 +589,13 @@
         altitude: 2083,
         url: 'https://rifugiodibona.com/',
         status: 'CLOSED',
-        expectedOpening: 'ינואר – פברואר',
-        lastChecked: 'לפני זמן קצר',
+        expectedOpening: 'סוף נובמבר (נבדק אישית ע"י יובל ✅)',
+        verifiedByYuval: true,
+        lastChecked: 'עודכן ע"י יובל',
         checkMode: 'SCRAPER',
         keywords: 'Book, Prenotazioni, Camere, Rooms, Disponibile',
-        lastSnippet: 'בקתה מרווחת ומסבירת פנים למרגלות מצוקי הטופאנה.',
-        notes: 'בקתה גדולה (כ-50 מיטות) עם מטבח הררי עשיר. מיקום אסטרטגי מצוין למי שממשיך למחרת לאבראו.'
+        lastSnippet: 'תשובת הבקתה במייל: פתיחת הרשמות בסוף נובמבר (נבדק אישית ע"י יובל).',
+        notes: 'בקתה מרווחת ומסבירת פנים למרגלות מצוקי הטופאנה. מועד פתיחה רשמי מאומת ע"י יובל: סוף נובמבר!'
       },
       {
         id: 'giussani',
@@ -649,7 +650,8 @@
         url: 'https://www.rifugionuvolau.it',
         status: 'CLOSED',
         expectedOpening: 'תחילת ינואר (נבדק אישית ע"י יובל ✅)',
-        lastChecked: 'לפני זמן קצר',
+        verifiedByYuval: true,
+        lastChecked: 'עודכן ע"י יובל',
         checkMode: 'SCRAPER',
         keywords: 'Prenota, Booking, Open, Disponibile',
         lastSnippet: 'מועד פתיחת ההרשמה: תחילת ינואר (נבדק אישית ע"י יובל).',
@@ -773,7 +775,7 @@
 
     // State initialization strictly limited to the 14 huts across clusters 1 & 2
     let huts = INITIAL_HUTS;
-    safeStorage.set('dolomiti_huts_v20', JSON.stringify(huts));
+    safeStorage.set('dolomiti_huts_v21', JSON.stringify(huts));
 
     let activeClusterFilter = 'ALL';
 
@@ -1071,6 +1073,7 @@
       const isOpen = h.status === 'OPEN';
       const isFull = h.status === 'FULL' || h.status === 'FULLY_BOOKED';
       const isPrimary = h.isPrimary === true;
+      const isVerifiedByYuval = h.verifiedByYuval === true || (h.expectedOpening && h.expectedOpening.includes('יובל'));
 
       let cardStyle = isPrimary ? clusterConfig.themeClasses.primaryCard : clusterConfig.themeClasses.substituteCard;
       if (isOpen) {
@@ -1078,12 +1081,26 @@
       } else if (isFull) {
         // High-contrast, dark prominent styling for fully booked huts (e.g. Malga Giau)
         cardStyle = 'bg-slate-900 border-2 border-rose-500 shadow-2xl ring-2 ring-rose-500/50 text-slate-100 hover:border-rose-400';
+      } else if (isVerifiedByYuval) {
+        // High-visibility border and soft glow for huts verified by Yuval
+        cardStyle += ' ring-2 ring-emerald-500/70 border-emerald-400 shadow-md';
       }
 
       return `
         <div class="rounded-2xl p-5 transition-all duration-300 relative flex flex-col justify-between ${cardStyle}">
           
           <div>
+            ${isVerifiedByYuval ? `
+            <!-- Prominent Verified Banner for Yuval -->
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white text-xs font-black px-3.5 py-1.5 rounded-xl mb-3.5 flex items-center justify-between shadow-md shadow-emerald-900/20">
+              <span class="flex items-center gap-1.5">
+                <span>✨</span>
+                <span>נבדק ומאומת ישירות ע"י יובל</span>
+              </span>
+              <span class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">מידע רשמי ✅</span>
+            </div>
+            ` : ''}
+
             <!-- Priority & Status Badges -->
             <div class="flex items-center justify-between gap-2 mb-3">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black shadow-sm ${
@@ -1091,6 +1108,8 @@
                   ? 'bg-rose-950/90 text-rose-300 border border-rose-700'
                   : isPrimary 
                   ? 'bg-amber-400 text-amber-950 border border-amber-500' 
+                  : isVerifiedByYuval
+                  ? 'bg-emerald-100 text-emerald-950 border border-emerald-400'
                   : 'bg-slate-100 text-slate-800 border border-slate-300'
               }">
                 <span>${h.priorityLabel || (isPrimary ? '👑 בחירה ראשונה' : '🔄 תחליף')}</span>
@@ -1114,6 +1133,7 @@
               <h3 class="text-xl font-black font-heading flex items-center gap-1.5 ${isFull ? 'text-white' : 'text-slate-950'}">
                 ${h.name}
                 ${isPrimary ? '<span class="text-amber-500 text-base" title="בחירה ראשונה">⭐</span>' : ''}
+                ${isVerifiedByYuval ? '<span class="text-emerald-700 text-base" title="אומת אישית ע&quot;י יובל">💎</span>' : ''}
                 ${isFull ? '<span class="text-rose-400 text-[11px] px-2 py-0.5 rounded-full bg-rose-950 border border-rose-700 font-bold">🚫 FULL</span>' : ''}
               </h3>
               <div class="text-xs ${isFull ? 'text-slate-300' : 'text-slate-700'} flex items-center gap-1 mt-0.5 font-bold">
@@ -1154,14 +1174,19 @@
             </div>
 
             <!-- Expected Opening Window -->
-            <div class="flex items-center gap-2 text-xs font-black px-3 py-2 rounded-xl mb-3 shadow-sm border-2 ${
+            <div class="flex items-center justify-between text-xs font-black px-3.5 py-2.5 rounded-xl mb-3 shadow-sm border-2 ${
               isFull
                 ? 'bg-rose-950/95 border-rose-600 text-rose-200'
+                : isVerifiedByYuval
+                ? 'bg-emerald-50 border-2 border-emerald-500 text-emerald-950 ring-2 ring-emerald-400/30'
                 : 'bg-amber-100 border-amber-400 text-amber-950'
             }">
-              <span class="text-sm">${isFull ? '🚫' : '📅'}</span>
-              <span class="${isFull ? 'text-rose-300' : 'text-slate-800'}">סטטוס פתיחה:</span>
-              <span class="font-black ${isFull ? 'text-white' : 'text-amber-950'}">${h.expectedOpening || 'ינואר – פברואר'}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-base">${isFull ? '🚫' : isVerifiedByYuval ? '🎯' : '📅'}</span>
+                <span class="${isFull ? 'text-rose-300' : isVerifiedByYuval ? 'text-emerald-950 font-black' : 'text-slate-800'}">סטטוס פתיחה:</span>
+                <span class="font-black ${isFull ? 'text-white' : isVerifiedByYuval ? 'text-emerald-950 underline decoration-emerald-600 decoration-2' : 'text-amber-950'}">${h.expectedOpening || 'ינואר – פברואר'}</span>
+              </div>
+              ${isVerifiedByYuval ? '<span class="shrink-0 bg-emerald-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">מאומת ע"י יובל ✅</span>' : ''}
             </div>
 
             <!-- Hut Notes -->
