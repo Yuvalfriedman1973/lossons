@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    <!-- Clusters Container - Grouped by 4 distinct geographical areas -->
+    <!-- Clusters Container -->
     <div id="clusters-container" class="space-y-8">
       <!-- Cluster sections rendered via JavaScript -->
     </div>
@@ -277,17 +277,12 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-800 mb-1">אזור בדולומיטים</label>
-            <input type="text" id="hut-region" required placeholder="Forcella Pecol / Pescul" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+            <input type="text" id="hut-region" required placeholder="Passo Giau / Cortina" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-800 mb-1">גובה (מטרים)</label>
-            <input type="number" id="hut-altitude" placeholder="1657" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
+            <input type="number" id="hut-altitude" placeholder="2236" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
           </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-black text-amber-900 mb-1">🧭 קשר גיאוגרפי (הסבר עבור מי התחליף ומה המרחק)</label>
-          <input type="text" id="hut-substitute-info" placeholder="למשל: על צלע הרכס בשביל 561 / רכבל פרטצה" class="w-full bg-amber-50/60 border border-amber-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-amber-600 focus:bg-white font-medium">
         </div>
 
         <div>
@@ -303,11 +298,6 @@
         <div>
           <label class="block text-xs font-bold text-slate-800 mb-1">כתובת אתר דף ההרשמה / הזמנות (URL)</label>
           <input type="url" id="hut-url" required placeholder="https://..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white font-mono text-xs">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1">הערות ומידע נוסף</label>
-          <input type="text" id="hut-notes" placeholder="פרטים על ההזמנה, קיבולת, חדרים וכד'..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-teal-700 focus:bg-white">
         </div>
 
         <div>
@@ -331,14 +321,14 @@
         <span>✈️</span> הגדרת התראות לטלגרם
       </h3>
       <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
-        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 15 הבקתות באשכולות 1 ו-2.
+        הזן את הטוקן וה-Chat ID שלך מטלגרם כדי לקבל התראות מתפרצות בזמן אמת.
       </p>
 
       <div class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-800 mb-1">Telegram Bot Token</label>
           <input type="text" id="tg-token" placeholder="למשל: 123456789:ABCdefGhIJKlmNoPQ..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono text-xs focus:outline-none focus:border-teal-700 focus:bg-white">
-          <span class="text-[11px] text-slate-500">מופקים מ-@BotFather בטלגרם.</span>
+          <span class="text-[11px] text-slate-500">מופק מ-@BotFather בטלגרם.</span>
         </div>
 
         <div>
@@ -402,7 +392,7 @@
         <span>⚙️</span> הפעלה אוטומטית 24/7 בענן בחינם
       </h3>
       <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
-        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 10 הבקתות באשכולות 1 ו-2.
+        סקריפט Python ו-GitHub Actions המוכנים לריצה בענן לשליחת התראות ל-kzyuval@gmail.com עבור 14 הבקתות באשכולות 1 ו-2.
       </p>
 
       <div class="space-y-4">
@@ -470,7 +460,6 @@
       }
     };
 
-    // 4 Clusters Meta Definitions (including Cluster 3a)
     const CLUSTERS_CONFIG = {
       LAGAZUOI: {
         id: 'LAGAZUOI',
@@ -498,7 +487,6 @@
       }
     };
 
-    // Strictly 14 Huts belonging exclusively to clusters 1 & 2
     const INITIAL_HUTS = [
       // --- CLUSTER 1: LAGAZUOI (6) ---
       {
@@ -508,7 +496,6 @@
         isPrimary: true,
         priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
         distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
-        substituteInfo: 'בקתת היעד בפסגה (מרפסת פנורמית וסאונה)',
         region: 'Passo Falzarego / Cortina',
         altitude: 2752,
         url: 'https://www.rifugiolagazuoi.com',
@@ -516,9 +503,7 @@
         expectedOpening: 'אמצע אוקטובר – תחילת נובמבר',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book Now, Disponibile, Available, Booking Open',
-        lastSnippet: 'Winter bookings only. Summer reservations typically open Oct/Nov.',
-        notes: 'הבקתה המבוקשת ביותר. נפתחת ראשונה ונחטפת תוך ימים ספורים!'
+        keywords: 'Prenota, Book Now, Disponibile, Available, Booking Open'
       },
       {
         id: 'col_gallina',
@@ -527,7 +512,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר (מעגל 1: פלצרגו)',
         distanceFromPrimary: '3.5 ק"מ (כשעתיים הליכה בשביל 401/402, או 3 דק\' ברכבל ישיר ממעבר פלצרגו)',
-        substituteInfo: 'למרגלות הרכס במעבר פלצרגו – רכבל ישיר בבוקר ללגאזואי',
         region: 'Passo Falzarego / Cortina',
         altitude: 2055,
         url: 'https://rifugiocolgallina.com/',
@@ -535,9 +519,7 @@
         expectedOpening: 'נובמבר – דצמבר (נגיש לכביש)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book Now, Booking, Camere, Disponibile',
-        lastSnippet: 'פועל בחורף ובקיץ, פותח חלון הרשמות מוקדם בסוף הסתיו.',
-        notes: 'במעבר פלצרגו. גישה נוחה ישירות מהכביש ונקודת יציאה מושלמת לרכס לגאזואי.'
+        keywords: 'Prenota, Book Now, Booking, Camere, Disponibile'
       },
       {
         id: 'passo_valparola',
@@ -546,7 +528,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר (מעגל 1: ואלפארולה)',
         distanceFromPrimary: '3.8 ק"מ (כשעתיים עלייה בשביל 20B / Kaiserjäger, או 5 דק\' ברכב לרכבל)',
-        substituteInfo: 'על שפת אגם ואלפארולה – חיבור שבילים ישיר (20B) לפסגת לגאזואי',
         region: 'Passo Valparola (2168m)',
         altitude: 2168,
         url: 'https://rifugiopassovalparola.it/',
@@ -554,9 +535,7 @@
         expectedOpening: 'נובמבר – דצמבר (פתוח גם בחורף)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book, Rooms, Camere, Disponibile, Info',
-        lastSnippet: 'בקתה שקטה על שפת האגם במעבר ואלפארולה.',
-        notes: 'שוכנת במעבר ואלפארולה הפסטורלי מול Forte Tre Sassi. שביל Kaiserjäger מחבר אותה ישירות לפסגה.'
+        keywords: 'Prenota, Book, Rooms, Camere, Disponibile, Info'
       },
       {
         id: 'scotoni',
@@ -565,7 +544,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר (מעגל 2: ואל בדיה)',
         distanceFromPrimary: '3.5 ק"מ (שעה ו-45 דק\' עלייה בשביל 20 דרך אגם לגאזואי)',
-        substituteInfo: 'בעמק אלפיני ירוק מתחת לאגם לגאזואי – מטבח גורמה ועלייה ישירה בבוקר',
         region: 'Alpe di Lagazuoi / San Cassiano',
         altitude: 1985,
         url: 'https://www.scotoni.it/',
@@ -573,9 +551,7 @@
         expectedOpening: 'דצמבר – תחילת ינואר (מייל: info@scotoni.it)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Book, Prenota, Disponibile, Camere, Rooms, Request',
-        lastSnippet: 'בקתת בוטיק מבוקשת במיוחד עם מסעדה מעולה על שביל 20.',
-        notes: 'האלטרנטיבה המושלמת לצועדי אלטה ויה 1 המגיעים מצפון. מסעדת בשרים משובחת, סאונה אלפינית ונוף צוקים אדיר.'
+        keywords: 'Book, Prenota, Disponibile, Camere, Rooms, Request'
       },
       {
         id: 'dibona',
@@ -584,7 +560,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף (מעגל 3: טופאנה/אבראו)',
         distanceFromPrimary: '5.5 ק"מ (כשעתיים וחצי הליכה בשבילים 402 ו-404 דרך Forcella Col dei Bos)',
-        substituteInfo: 'למרגלות ה-Tofana di Rozes – תחנת מעבר מושלמת בין לגאזואי ל-5 Torri',
         region: 'Tofana di Rozes / Cortina',
         altitude: 2083,
         url: 'https://rifugiodibona.com/',
@@ -593,9 +568,7 @@
         verifiedByYuval: true,
         lastChecked: 'עודכן ע"י יובל',
         checkMode: 'SCRAPER',
-        keywords: 'Book, Prenotazioni, Camere, Rooms, Disponibile',
-        lastSnippet: 'תשובת הבקתה במייל: פתיחת הרשמות בסוף נובמבר (נבדק אישית ע"י יובל).',
-        notes: 'בקתה מרווחת ומסבירת פנים למרגלות מצוקי הטופאנה. מועד פתיחה רשמי מאומת ע"י יובל: סוף נובמבר!'
+        keywords: 'Book, Prenotazioni, Camere, Rooms, Disponibile'
       },
       {
         id: 'giussani',
@@ -604,7 +577,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף אלפיני (מעגל 3: לב הטופאנה)',
         distanceFromPrimary: '7.0 ק"מ (כ-3.5 שעות הליכה דרך Col dei Bos ואוכף Fontananegra)',
-        substituteInfo: 'בגובה 2,580 מ\' באוכף פונטננגרה – חלופה אלפינית גבוהה ומחוספסת',
         region: 'Tofana / Cortina d\'Ampezzo',
         altitude: 2580,
         url: 'https://www.rifugiogiussani.it/',
@@ -612,9 +584,7 @@
         expectedOpening: 'ינואר – פברואר (בקתת CAI Cortina)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota, Booking, Rifugio, Posti letto, Disponibile',
-        lastSnippet: 'בקתת מועדון האלפים (CAI) בלב רכס הטופאנה.',
-        notes: 'חוויה אלפינית בראש המצוקים הסלעיים. מתאימה למי שמחפש לינה בגובה רב במקום לגאזואי.'
+        keywords: 'Prenota, Booking, Rifugio, Posti letto, Disponibile'
       },
 
       // --- CLUSTER 2: AVERAU (8) ---
@@ -625,7 +595,6 @@
         isPrimary: true,
         priorityLabel: '👑 בחירה ראשונה (יעד ראשי)',
         distanceFromPrimary: 'בקתת היעד הראשית (0 ק"מ)',
-        substituteInfo: 'בקתת היעד באוכף נובולאו (מסעדת גורמה מפורסמת וחדרים משודרגים)',
         region: '5 Torri / Forcella Nuvolau',
         altitude: 2413,
         url: 'https://www.rifugioaverau.it/en/',
@@ -633,9 +602,7 @@
         expectedOpening: 'אמצע ינואר – תחילת פברואר',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Book, Prenota, Disponibile, Available, Camere, Rooms',
-        lastSnippet: 'מסעדת גורמה וחדרי אירוח אלפיניים מול ה-5 Torri והמרמולדה.',
-        notes: 'בגובה 2,413 מ\' באוכף נובולאו. מפורסמת במטבח המשובח, מרפסת שמש פנורמית לצ\'יווטה וחדרי לינה חדשים.'
+        keywords: 'Book, Prenota, Disponibile, Available, Camere, Rooms'
       },
       {
         id: 'nuvolau',
@@ -644,7 +611,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר ל-Averau',
         distanceFromPrimary: '1.2 ק"מ (25 דקות הליכה בשביל 439, עלייה של 162 מ\')',
-        substituteInfo: '25 דקות הליכה בלבד מעל אבראו באותו רכס בדיוק!',
         region: 'Cinque Torri / Cortina',
         altitude: 2575,
         url: 'https://www.rifugionuvolau.it',
@@ -653,9 +619,7 @@
         verifiedByYuval: true,
         lastChecked: 'עודכן ע"י יובל',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota, Booking, Open, Disponibile',
-        lastSnippet: 'מועד פתיחת ההרשמה: תחילת ינואר (נבדק אישית ע"י יובל).',
-        notes: 'הבקתה הוותיקה ביותר באזור קורטינה (1883), תצפית 360 מעלות פנורמית. מועד הפתיחה לתחילת ינואר נבדק אישית ע"י יובל מול הבקתה.'
+        keywords: 'Prenota, Booking, Open, Disponibile'
       },
       {
         id: 'scoiattoli',
@@ -664,7 +628,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר ל-Averau',
         distanceFromPrimary: '1.0 ק"מ (20 דקות הליכה בשביל 439, ירידה של 158 מ\')',
-        substituteInfo: '20 דקות הליכה מתחת לאבראו, למרגלות צוקי ה-5 Torri',
         region: '5 Torri / Cortina',
         altitude: 2255,
         url: 'http://www.rifugioscoiattoli.it/',
@@ -672,9 +635,7 @@
         expectedOpening: 'תחילת ינואר (1–10 בינואר)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenotazioni, Book, Booking, Camere, Open',
-        lastSnippet: 'הזמנות קיץ מתחילות בתחילת השנה האזרחית.',
-        notes: 'בלב מתחם ה-5 Torri עם אמבט עץ חם תחת כיפת השמיים ותצפית ישירה לצוקים.'
+        keywords: 'Prenotazioni, Book, Booking, Camere, Open'
       },
       {
         id: 'cinque_torri',
@@ -683,7 +644,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר ל-Averau',
         distanceFromPrimary: '1.8 ק"מ (35-40 דקות הליכה בשבילים 439 ו-440)',
-        substituteInfo: 'למרגלות ה-5 Torri, כ-30 דקות הליכה מאבראו',
         region: '5 Torri / Cortina',
         altitude: 2137,
         url: 'https://www.rifugio5torri.it/home.html',
@@ -691,9 +651,7 @@
         expectedOpening: 'אמצע ינואר – תחילת פברואר',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota ora, Book now, Disponibile, Booking',
-        lastSnippet: 'מייל הזמנות: info@rifugio5torri.it (מענה מתחיל בינואר).',
-        notes: 'בקתה אותנטית למרגלות ה-5 Torri, פופולרית מאוד בקרב צועדי Alta Via 1.'
+        keywords: 'Prenota ora, Book now, Disponibile, Booking'
       },
       {
         id: 'fedare',
@@ -702,7 +660,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ישיר ל-Averau',
         distanceFromPrimary: '2.2 ק"מ (45-50 דק\' ברגל בשביל 464, או 8 דק\' ברכבל כיסאות ישיר!)',
-        substituteInfo: 'רכבל כיסאות ישיר עולה מפדארה ישר למרפסת של אבראו!',
         region: 'Passo Giau / Colle Santa Lucia',
         altitude: 2000,
         url: 'http://www.rifugiofedare.it/',
@@ -710,9 +667,7 @@
         expectedOpening: 'דצמבר – תחילת ינואר',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenotazione, Book, Disponibile, Camere',
-        lastSnippet: 'ממתין לסריקת תחילת עונה בדצמבר.',
-        notes: 'למרגלות מעבר ג\'יאו עם רכבל כיסאות ישיר לרכס נובולאו/אווראו ומטבח משובח.'
+        keywords: 'Prenotazione, Book, Disponibile, Camere'
       },
       {
         id: 'passo_giau_hotel',
@@ -721,7 +676,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ל-Averau (מעבר ג\'יאו)',
         distanceFromPrimary: '3.8 ק"מ (שעה ו-20 דקות הליכה בשביל 452/464)',
-        substituteInfo: 'בפסגת מעבר ג\'יאו הסמוך – סיום אלטרנטיבי לאותו יום הליכה',
         region: 'Passo Giau (2236m)',
         altitude: 2236,
         url: 'https://www.passogiau.it/en/',
@@ -729,9 +683,7 @@
         expectedOpening: 'אוקטובר – נובמבר (6 חדרים בלבד)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Book, Reservations, Prenotazioni, Rooms, Availability',
-        lastSnippet: 'מלון בוטיק הררי בפסגת מעבר ג\'יאו. מומלץ לבדוק ישירות: info@passogiau.it',
-        notes: 'נוף פנורמי מדהים של 360 מעלות בפסגת מעבר ג\'יאו. ישנם 6 חדרים בלבד ולכן נתפס במהירות שיא.'
+        keywords: 'Book, Reservations, Prenotazioni, Rooms, Availability'
       },
       {
         id: 'malga_giau',
@@ -740,7 +692,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ל-Averau (חווה כפרית)',
         distanceFromPrimary: '4.8 ק"מ (כשעתיים הליכה בשביל 436/452, או 8 דק\' נסיעה לפדארה)',
-        substituteInfo: '1.5 ק"מ מתחת לפאסו ג\'יאו, מתאים אם הכל תפוס למעלה',
         region: 'Passo Giau / San Vito di Cadore',
         altitude: 2005,
         url: 'https://www.malgagiau.it/',
@@ -748,9 +699,7 @@
         expectedOpening: '🚫 תפוסה מלאה (Fully Booked)',
         lastChecked: 'עודכן ע"י יובל',
         checkMode: 'SCRAPER',
-        keywords: 'Prenotazioni, Booking, Tavoli, Camere, Aperto',
-        lastSnippet: 'החווה סומנה בתפוסה מלאה (Fully Booked)',
-        notes: 'חווה אלפינית בדרך למעבר ג\'יאו. סומנה ע"י יובל בתפוסה מלאה (Fully Booked).'
+        keywords: 'Prenotazioni, Booking, Tavoli, Camere, Aperto'
       },
       {
         id: 'piezza_da_aurelio',
@@ -759,7 +708,6 @@
         isPrimary: false,
         priorityLabel: '🔄 תחליף ל-Averau (פאסו ג\'יאו)',
         distanceFromPrimary: '3.2 ק"מ (כשעה ו-10 דק\' הליכה בשביל 452/464, או 5 דק\' נסיעה לרכבל פדארה)',
-        substituteInfo: 'במורד מעבר ג\'יאו (2,175 מ\') – מסעדת שף הררית ואירוח אלפיני מבוקש',
         region: 'Passo Giau (2175m) / Colle Santa Lucia',
         altitude: 2175,
         url: 'https://www.da-aurelio.it/',
@@ -767,15 +715,12 @@
         expectedOpening: 'נובמבר – דצמבר (מייל: infodaaurelio@gmail.com)',
         lastChecked: 'לפני זמן קצר',
         checkMode: 'SCRAPER',
-        keywords: 'Prenota, Book, Table, Rooms, Disponibile, Contact',
-        lastSnippet: 'מסעדת גורמה אלפינית ב-Passo Giau. פניות להזמנות: infodaaurelio@gmail.com',
-        notes: 'בגובה 2,175 מטר במעבר ג\'יאו. ידועה במטבח מקומי משובח ביותר, נקודת סיום נהדרת למקטע אבראו.'
+        keywords: 'Prenota, Book, Table, Rooms, Disponibile, Contact'
       }
     ];
 
-    // State initialization strictly limited to the 14 huts across clusters 1 & 2
     let huts = INITIAL_HUTS;
-    safeStorage.set('dolomiti_huts_v21', JSON.stringify(huts));
+    safeStorage.set('dolomiti_huts_v22', JSON.stringify(huts));
 
     let activeClusterFilter = 'ALL';
 
@@ -792,7 +737,6 @@
     let checkIntervalSeconds = 15 * 60;
     let remainingTimerSeconds = checkIntervalSeconds;
 
-    // Alpine Bell Sound via Web Audio API
     let audioCtx = null;
     function playNotificationChime() {
       try {
@@ -947,7 +891,7 @@
     });
 
     function saveHuts() {
-      safeStorage.set('dolomiti_huts_v18', JSON.stringify(huts));
+      safeStorage.set('dolomiti_huts_v22', JSON.stringify(huts));
       renderStats();
     }
 
@@ -969,7 +913,6 @@
     function setClusterFilter(filterKey) {
       activeClusterFilter = filterKey;
       
-      // Update tab styles
       document.querySelectorAll('.cluster-tab').forEach(btn => {
         btn.classList.remove('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-sm');
         btn.classList.add('border');
@@ -998,15 +941,13 @@
       const search = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
       const statusFilter = document.getElementById('status-filter')?.value || 'ALL';
 
-      // 1. Filter huts by search & status
       let filtered = huts.filter(h => {
-        const textSearch = (h.name + ' ' + h.region + ' ' + (h.expectedOpening || '') + ' ' + (h.priorityLabel || '') + ' ' + (h.substituteInfo || '') + ' ' + (h.distanceFromPrimary || '')).toLowerCase();
+        const textSearch = (h.name + ' ' + h.region + ' ' + (h.expectedOpening || '') + ' ' + (h.priorityLabel || '') + ' ' + (h.distanceFromPrimary || '')).toLowerCase();
         const matchSearch = textSearch.includes(search);
         const matchStatus = statusFilter === 'ALL' || h.status === statusFilter;
         return matchSearch && matchStatus;
       });
 
-      // 2. Filter by selected cluster tab
       if (activeClusterFilter === 'PRIMARY_ONLY') {
         filtered = filtered.filter(h => h.isPrimary === true);
       } else if (activeClusterFilter !== 'ALL') {
@@ -1021,7 +962,6 @@
         if (emptyState) emptyState.classList.add('hidden');
       }
 
-      // 3. Group by the 2 Selected Clusters (1 & 2)
       const clusterOrder = ['LAGAZUOI', 'AVERAU'];
       let outputHtml = '';
 
@@ -1079,10 +1019,8 @@
       if (isOpen) {
         cardStyle += ' status-pulse-open ring-4 ring-emerald-500/60';
       } else if (isFull) {
-        // High-contrast, dark prominent styling for fully booked huts (e.g. Malga Giau)
         cardStyle = 'bg-slate-900 border-2 border-rose-500 shadow-2xl ring-2 ring-rose-500/50 text-slate-100 hover:border-rose-400';
       } else if (isVerifiedByYuval) {
-        // High-visibility border and soft glow for huts verified by Yuval
         cardStyle += ' ring-2 ring-emerald-500/70 border-emerald-400 shadow-md';
       }
 
@@ -1144,7 +1082,7 @@
             </div>
 
             <!-- Precise Distance from Target Hut Badge -->
-            <div class="rounded-xl px-3 py-2 mb-2.5 flex items-start gap-2 border shadow-sm ${
+            <div class="rounded-xl px-3 py-2 mb-3 flex items-start gap-2 border shadow-sm ${
               isFull
                 ? 'bg-slate-800/95 border-rose-900/60 text-slate-200'
                 : isPrimary 
@@ -1158,23 +1096,8 @@
               </div>
             </div>
 
-            <!-- Relationship to Main Target -->
-            <div class="text-xs font-bold p-2.5 rounded-xl mb-3 border flex items-start gap-2 shadow-inner ${
-              isFull
-                ? 'bg-slate-800/95 border-slate-700 text-slate-200'
-                : isPrimary 
-                ? 'bg-amber-50 border-amber-300 text-amber-950' 
-                : 'bg-slate-100 border-slate-300 text-slate-900'
-            }">
-              <span class="text-base">${isFull ? '📌' : isPrimary ? '👑' : '🧭'}</span>
-              <div class="leading-snug">
-                <span class="block font-black ${isFull ? 'text-slate-100' : 'text-slate-950'}">${isPrimary ? 'מעמד: בקתת יעד עיקרית' : 'מיקום ויחס לבקתת היעד:'}</span>
-                <span class="font-medium ${isFull ? 'text-slate-300' : ''}">${h.substituteInfo || 'בקתת יעד'}</span>
-              </div>
-            </div>
-
             <!-- Expected Opening Window -->
-            <div class="flex items-center justify-between text-xs font-black px-3.5 py-2.5 rounded-xl mb-3 shadow-sm border-2 ${
+            <div class="flex items-center justify-between text-xs font-black px-3.5 py-2.5 rounded-xl mb-4 shadow-sm border-2 ${
               isFull
                 ? 'bg-rose-950/95 border-rose-600 text-rose-200'
                 : isVerifiedByYuval
@@ -1189,24 +1112,6 @@
               ${isVerifiedByYuval ? '<span class="shrink-0 bg-emerald-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">מאומת ע"י יובל ✅</span>' : ''}
             </div>
 
-            <!-- Hut Notes -->
-            <p class="text-xs mb-3 p-2.5 rounded-xl border leading-relaxed font-semibold ${
-              isFull
-                ? 'bg-slate-800/90 border-slate-700 text-slate-300'
-                : 'bg-slate-50 border-slate-200 text-slate-800'
-            }">
-              ${h.notes || 'בקתת הרים פופולרית בדולומיטים.'}
-            </p>
-
-            <!-- Last Scanned Indicator -->
-            <div class="text-[11px] font-mono p-2.5 rounded-xl border mb-4 break-words shadow-inner ${
-              isFull
-                ? 'bg-black/90 border-rose-900/60 text-slate-200'
-                : 'bg-slate-950 border-slate-800 text-slate-100'
-            }">
-              <span class="${isFull ? 'text-rose-400' : 'text-teal-400'} font-bold block mb-0.5">🔍 אינדיקטור / טקסט אחרון שזוהה:</span>
-              "${h.lastSnippet || 'ממתין לסריקה ראשונית'}"
-            </div>
           </div>
 
           <!-- Action Buttons -->
@@ -1326,12 +1231,10 @@
       document.getElementById('hut-name').value = hut.name;
       document.getElementById('hut-cluster').value = hut.cluster || 'AVERAU';
       document.getElementById('hut-is-primary').value = hut.isPrimary ? 'true' : 'false';
-      document.getElementById('hut-substitute-info').value = hut.substituteInfo || '';
       document.getElementById('hut-distance').value = hut.distanceFromPrimary || '';
       document.getElementById('hut-region').value = hut.region;
       document.getElementById('hut-altitude').value = hut.altitude || '';
       document.getElementById('hut-expected-opening').value = hut.expectedOpening || 'דצמבר – ינואר';
-      document.getElementById('hut-notes').value = hut.notes || '';
       document.getElementById('hut-url').value = hut.url;
       document.getElementById('hut-keywords').value = hut.keywords;
 
@@ -1345,12 +1248,10 @@
       const name = document.getElementById('hut-name').value.trim();
       const cluster = document.getElementById('hut-cluster').value;
       const isPrimary = document.getElementById('hut-is-primary').value === 'true';
-      const substituteInfo = document.getElementById('hut-substitute-info').value.trim();
       const distanceFromPrimary = document.getElementById('hut-distance').value.trim() || (isPrimary ? 'בקתת היעד הראשית (0 ק"מ)' : 'מחוברת באשכול');
       const region = document.getElementById('hut-region').value.trim();
       const altitude = parseInt(document.getElementById('hut-altitude').value) || 1650;
       const expectedOpening = document.getElementById('hut-expected-opening').value.trim() || 'דצמבר – ינואר';
-      const notes = document.getElementById('hut-notes').value.trim();
       const url = document.getElementById('hut-url').value.trim();
       const keywords = document.getElementById('hut-keywords').value.trim();
 
@@ -1364,11 +1265,9 @@
           hut.isPrimary = isPrimary;
           hut.priorityLabel = priorityLabel;
           hut.distanceFromPrimary = distanceFromPrimary;
-          hut.substituteInfo = substituteInfo;
           hut.region = region;
           hut.altitude = altitude;
           hut.expectedOpening = expectedOpening;
-          hut.notes = notes;
           hut.url = url;
           hut.keywords = keywords;
           addActivityLog(`עודכנה בקתת ${name} באשכול ${cluster}`, 'info');
@@ -1381,17 +1280,14 @@
           isPrimary,
           priorityLabel,
           distanceFromPrimary,
-          substituteInfo,
           region,
           altitude,
           expectedOpening,
-          notes,
           url,
           keywords,
           checkMode: 'SCRAPER',
           status: 'CLOSED',
-          lastChecked: 'נוסף עכשיו',
-          lastSnippet: 'ממתין לסריקה ראשונית'
+          lastChecked: 'נוסף עכשיו'
         };
         huts.unshift(newHut);
         addActivityLog(`נוספה בקתה חדשה: ${name} (אשכול: ${cluster})`, 'success');
@@ -1445,8 +1341,6 @@
 
       try {
         let detectedOpen = false;
-        let snippet = '';
-
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(hut.url)}`;
         
         try {
@@ -1464,18 +1358,12 @@
 
             if (foundKeyword) {
               detectedOpen = true;
-              snippet = `נמצאה מילת מפתח פעילה: "${foundKeyword}"`;
-            } else {
-              snippet = `הדף נסרק. צפי פתיחה: ${hut.expectedOpening}`;
             }
-          } else {
-            snippet = `האתר נבדק. צפי פתיחה: ${hut.expectedOpening}.`;
           }
         } catch(proxyErr) {
-          snippet = `בדיקת הדף הושלמה. צפי פתיחה: ${hut.expectedOpening}.`;
+          console.warn('Proxy error:', proxyErr);
         }
 
-        hut.lastSnippet = snippet;
         hut.lastChecked = new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 
         if (detectedOpen) {
@@ -1488,7 +1376,7 @@
           
           sendNotificationEmail(
             `🚨 נפתחה הרשמה לבקתת ${hut.name} (${hut.priorityLabel})!`,
-            `שלום יובל,\n\nנפתחה ההרשמה לבקתה:\n- שם: ${hut.name}\n- מעמד: ${hut.priorityLabel}\n- קשר: ${hut.substituteInfo}\n- אזור: ${hut.region}\n- גובה: ${hut.altitude}m\n\nקישור להזמנה:\n${hut.url}\n\nDolomiti Rifugi Radar`
+            `שלום יובל,\n\nנפתחה ההרשמה לבקתה:\n- שם: ${hut.name}\n- מעמד: ${hut.priorityLabel}\n- אזור: ${hut.region}\n- גובה: ${hut.altitude}m\n\nקישור להזמנה:\n${hut.url}\n\nDolomiti Rifugi Radar`
           );
 
           if (telegramSettings.token && telegramSettings.chatId) {
@@ -1540,7 +1428,6 @@
       const primaryHut = huts.find(h => h.isPrimary && h.status === 'CLOSED') || huts[0];
       if (primaryHut) {
         primaryHut.status = 'OPEN';
-        primaryHut.lastSnippet = 'הודעת פתיחת הרשמות לעונת הקיץ זוהתה בדף הראשי!';
         primaryHut.lastChecked = 'הדמיה (' + new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + ')';
         
         playNotificationChime();
@@ -1616,7 +1503,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: chatId,
-            text: '🏔️ *בדיקת מערכת Dolomiti Rifugi Radar!*\nהבוט מחובר וישלח התראות לפי אשכולות 1, 2, 3 ו-3א.',
+            text: '🏔️ *בדיקת מערכת Dolomiti Rifugi Radar!*\nהבוט מחובר וישלח התראות עבור אשכולות 1 ו-2.',
             parse_mode: 'Markdown'
           })
         });
@@ -1688,7 +1575,7 @@
       addActivityLog(`שולח מייל בדיקה לכתובת: ${emailInput}`, 'info');
 
       const subject = "🏔️ בדיקת התראה: מערכת ניטור אשכולות בדולומיטים מחוברת!";
-      const body = `היי יובל,\n\nזהו מייל בדיקה לאישור חיבור מערכת ההתראות עבור בקתות בדולומיטים.\n\nהבקתות מאורגנות לפי 2 הבחירות הראשיות שלך:\n1. אשכול 1: לגאזואי (Lagazuoi + Col Gallina)\n2. אשכול 2: אבראו (Averau + Nuvolau, Scoiattoli, 5 Torri, Fedare, Berghotel Passo Giau, Malga Giau, Piezza - Da Aurelio)\n\nמועד הבדיקה: ${new Date().toLocaleString('he-IL')}\nכתובת יעד: ${emailInput}`;
+      const body = `היי יובל,\n\nזהו מייל בדיקה לאישור חיבור מערכת ההתראות עבור בקתות בדולומיטים.\n\nהבקתות מאורגנות לפי 2 הבחירות הראשיות שלך:\n1. אשכול 1: לגאזואי (Lagazuoi + 5 תחליפים)\n2. אשכול 2: אבראו (Averau + 7 תחליפים)\n\nמועד הבדיקה: ${new Date().toLocaleString('he-IL')}\nכתובת יעד: ${emailInput}`;
 
       let sent = false;
       if (keyInput) {
@@ -1752,7 +1639,6 @@
         name: h.name,
         cluster: h.cluster,
         isPrimary: h.isPrimary,
-        substituteInfo: h.substituteInfo,
         url: h.url,
         region: h.region,
         expectedOpening: h.expectedOpening,
@@ -1785,7 +1671,6 @@ def send_email_alert(hut):
 זוהתה פתיחת הרשמה עבור הבקתה:
 - שם הבקתה: {hut['name']}
 - מעמד: {'👑 בחירה ראשונה' if hut.get('isPrimary') else '🔄 תחליף באשכול'}
-- יחס לבקתת היעד: {hut.get('substituteInfo', '')}
 - אזור: {hut.get('region', '')}
 
 קישור ישיר להזמנה:
@@ -1878,7 +1763,6 @@ jobs:
       openModal('modal-export');
     }
 
-    // Attach globals to window
     window.openEmailModal = openEmailModal;
     window.saveEmailSettings = saveEmailSettings;
     window.sendTestEmail = sendTestEmail;
